@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'estudo_ti_platform_v1';
+const STORAGE_VERSION = 2;
 
 const tracks = [
   ['Fundamentos de TI', 'Hardware, sistemas operacionais, arquivos, usuários e troubleshooting.', 'base'],
@@ -143,10 +144,44 @@ const initialState = {
   startedAt: new Date().toISOString()
 };
 
+let accountStore = { version: STORAGE_VERSION, activeUser: null, lastUser: null, users: {} };
+
+function normalizeUserKey(name) {
+  return String(name || '').trim().toLocaleLowerCase('pt-BR');
+}
+
+function mergeUserState(saved = {}) {
+  return {
+    ...initialState,
+    ...saved,
+    completed: Array.isArray(saved.completed) ? saved.completed : [],
+    favorites: Array.isArray(saved.favorites) ? saved.favorites : [],
+    notes: Array.isArray(saved.notes) ? saved.notes : [],
+    review: saved.review || {},
+    projects: saved.projects || {},
+    lab: { ...initialState.lab, ...(saved.lab || {}) },
+    assessment: { ...initialState.assessment, ...(saved.assessment || {}) }
+  };
+}
+
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    return { ...initialState, ...saved, completed: saved.completed || [], favorites: saved.favorites || [], notes: saved.notes || [], review: saved.review || {}, projects: saved.projects || {}, lab: { ...initialState.lab, ...(saved.lab || {}) }, assessment: { ...initialState.assessment, ...(saved.assessment || {}) } };
+    if (saved.version === STORAGE_VERSION && saved.users && typeof saved.users === 'object') {
+      accountStore = { version: STORAGE_VERSION, activeUser: saved.activeUser || null, lastUser: saved.lastUser || saved.activeUser || null, users: saved.users };
+      const userState = accountStore.activeUser ? accountStore.users[accountStore.activeUser] : null;
+      return mergeUserState(userState || {});
+    }
+
+    const legacyState = mergeUserState(saved);
+    if (legacyState.profile?.name) {
+      const key = normalizeUserKey(legacyState.profile.name);
+      accountStore.activeUser = key;
+      accountStore.lastUser = key;
+      accountStore.users[key] = legacyState;
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(accountStore));
+    return legacyState;
   } catch (error) {
     console.warn('Não foi possível carregar o perfil local.', error);
     return { ...initialState };
@@ -161,7 +196,43 @@ const moduleById = (id) => modules.find((item) => item.id === id) || modules[0];
 const selectedIncident = () => incidents.find((item) => item.id === state.lab.incidentId) || incidents[0];
 
 function saveState() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  if (state.profile?.name) {
+    const key = normalizeUserKey(state.profile.name);
+    if (accountStore.activeUser && accountStore.activeUser !== key) {
+      delete accountStore.users[accountStore.activeUser];
+    }
+    accountStore.activeUser = key;
+    accountStore.lastUser = key;
+    accountStore.users[key] = JSON.parse(JSON.stringify(state));
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(accountStore));
+}
+
+function activateLocalUser(name) {
+  const key = normalizeUserKey(name);
+  const savedUser = accountStore.users[key];
+  if (savedUser) {
+    const restored = mergeUserState(savedUser);
+    Object.keys(state).forEach((property) => delete state[property]);
+    Object.assign(state, restored);
+    state.profile = { ...restored.profile, name: name.trim() };
+  } else {
+    const freshState = mergeUserState({ profile: { name: name.trim() }, route: 'assessment' });
+    Object.keys(state).forEach((property) => delete state[property]);
+    Object.assign(state, freshState);
+  }
+  accountStore.activeUser = key;
+  accountStore.lastUser = key;
+  state.route = state.assessment.result ? 'dashboard' : 'assessment';
+  saveState();
+}
+
+function signOutLocalUser() {
+  saveState();
+  accountStore.lastUser = accountStore.activeUser;
+  accountStore.activeUser = null;
+  Object.assign(state, mergeUserState({ profile: null, route: 'dashboard' }));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(accountStore));
 }
 
 function icon(name) {
@@ -421,7 +492,9 @@ function renderView() {
 function render() {
   document.documentElement.dataset.theme = state.theme;
   if (!state.profile) {
-    root.innerHTML = `<main class="login-screen"><div class="login-side"><div class="login-logo">N<span>.</span></div><p class="section-kicker">NODE / STUDY · LOCAL LAB</p><h1>Seu ambiente de estudos em TI.</h1><p>Aprenda, investigue, pratique e documente. Um espaço pessoal para desenvolver raciocínio técnico com situações de suporte.</p><div class="login-flow"><span>APRENDER</span><i>→</i><span>INVESTIGAR</span><i>→</i><span>DOCUMENTAR</span></div><div class="login-network" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i><i></i></div></div><section class="login-form-side"><form class="login-form" id="login-form"><p class="section-kicker">ACESSO AO WORKSPACE</p><h2>Entrar no laboratório</h2><p>Crie seu perfil local para salvar o progresso neste navegador.</p><label for="login-name">Como quer ser chamado?</label><input id="login-name" name="name" placeholder="Seu nome" autocomplete="name" required minlength="2" maxlength="50"><button class="primary-action" type="submit">Entrar no meu espaço ${icon('arrow')}</button><small>Perfil local de estudo. Esta versão não envia seus dados para um servidor.</small></form></section></main>`;
+    const previousName = accountStore.lastUser ? accountStore.users[accountStore.lastUser]?.profile?.name || '' : '';
+    const savedUsers = Object.entries(accountStore.users).map(([key, user]) => ({ key, name: user.profile?.name })).filter((user) => user.name);
+    root.innerHTML = `<main class="login-screen"><div class="login-side"><div class="login-logo">N<span>.</span></div><p class="section-kicker">NODE / STUDY · LOCAL LAB</p><h1>Seu ambiente de estudos em TI.</h1><p>Aprenda, investigue, pratique e documente. Um espaço pessoal para desenvolver raciocínio técnico com situações de suporte.</p><div class="login-flow"><span>APRENDER</span><i>→</i><span>INVESTIGAR</span><i>→</i><span>DOCUMENTAR</span></div><div class="login-network" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i><i></i></div></div><section class="login-form-side"><form class="login-form" id="login-form"><p class="section-kicker">PERFIL LOCAL</p><h2>${previousName ? `Bem-vindo de volta, ${escapeHTML(previousName)}.` : 'Entrar no laboratório'}</h2><p>Digite o mesmo nome para retomar aulas, notas e progresso salvos neste navegador.</p><label for="login-name">Nome do perfil</label><input id="login-name" name="name" value="${escapeHTML(previousName)}" list="saved-local-users" placeholder="Seu nome" autocomplete="name" required minlength="2" maxlength="50"><datalist id="saved-local-users">${savedUsers.map((user) => `<option value="${escapeHTML(user.name)}"></option>`).join('')}</datalist><button class="primary-action" type="submit">${previousName ? 'Retomar meu espaço' : 'Criar perfil local'} ${icon('arrow')}</button>${savedUsers.length ? `<div class="saved-profiles"><span>PERFIS NESTE NAVEGADOR</span><div>${savedUsers.map((user) => `<button type="button" data-action="select-local-user" data-user-key="${escapeHTML(user.key)}">${escapeHTML(user.name)}</button>`).join('')}</div></div>` : ''}<small>Os dados são salvos neste navegador. Esse perfil local não usa senha nem protege o acesso como uma conta online.</small></form></section></main>`;
     return;
   }
   if (!state.assessment.result && state.route !== 'assessment') {
@@ -538,7 +611,12 @@ root.addEventListener('click', (event) => {
   if (action === 'toggle-sidebar') { state.sidebarOpen = !state.sidebarOpen; render(); }
   if (action === 'close-sidebar') { state.sidebarOpen = false; render(); }
   if (action === 'theme') { state.theme = state.theme === 'dark' ? 'light' : 'dark'; saveState(); render(); }
-  if (action === 'logout') { state.profile = null; state.route = 'dashboard'; saveState(); render(); }
+  if (action === 'logout') { signOutLocalUser(); render(); }
+  if (action === 'select-local-user') {
+    const selectedUser = accountStore.users[actionButton.dataset.userKey];
+    const nameField = document.getElementById('login-name');
+    if (selectedUser?.profile?.name && nameField) { nameField.value = selectedUser.profile.name; nameField.focus(); }
+  }
   if (action === 'open-module') { state.selectedModule = id; state.route = 'lesson'; saveState(); render(); }
   if (action === 'open-track') { navigate(id === 'track-3' ? 'course' : 'tracks'); }
   if (action === 'start-assessment') { state.assessment = { answers: {}, currentIndex: 0, result: null, awarded: state.assessment.awarded }; state.route = 'assessment'; saveState(); render(); }
@@ -620,7 +698,7 @@ root.addEventListener('submit', (event) => {
   event.preventDefault();
   if (event.target.id === 'login-form') {
     const name = new FormData(event.target).get('name').trim();
-    if (name.length >= 2) { state.profile = { name }; state.route = state.assessment.result ? 'dashboard' : 'assessment'; if (!state.assessment.result) state.assessment.currentIndex = 0; awardXp(0); saveState(); render(); }
+    if (name.length >= 2) { activateLocalUser(name); awardXp(0); saveState(); render(); }
   }
   if (event.target.id === 'profile-form') {
     state.profile = { ...state.profile, name: new FormData(event.target).get('name').trim() };
