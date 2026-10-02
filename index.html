@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NODE / STUDY | Plataforma de estudos em TI</title>
+    <meta
+      name="description"
+      content="Curso interativo de redes para suporte técnico N1/N2 com raciocínio, troubleshooting e diagramas didáticos."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="platform.css" />
+  </head>
+  <body class="platform-body">
+    <div id="platform-root"></div>
+    <header class="topbar">
+      <div class="container nav-wrap">
+        <div class="brand">
+          <span class="brand-mark">NET</span>
+          <div>
+            <strong>Curso de Redes</strong>
+            <small>Suporte N1/N2</small>
+          </div>
+        </div>
+        <nav class="main-nav" aria-label="Navegação do curso">
+          <a href="#inicio">Aula atual</a>
+          <a href="#modulos">Trilha</a>
+          <a href="#ambiente">Laboratório</a>
+          <a href="#diagramas">Diagramas</a>
+          <a href="#exercicios">Prática</a>
+          <a href="#progresso">Progresso</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section id="inicio" class="lesson-opening">
+        <div class="container">
+          <div class="lesson-opening-heading">
+            <p class="eyebrow">Redes de computadores · Unidade 1</p>
+            <p class="lesson-sequence">AULA 01 <span>•</span> FUNDAMENTOS</p>
+            <h1>Como os dados encontram o destino</h1>
+            <p class="lesson-opening-lead">
+              Nesta aula, vamos acompanhar uma conexão desde o computador até outro dispositivo e separar três conceitos
+              que costumam ser confundidos no suporte: rede local, endereço IP e gateway.
+            </p>
+          </div>
+
+          <div class="lesson-opening-grid">
+            <article class="lesson-opening-content">
+              <h2>O caminho de uma comunicação</h2>
+              <p>
+                Uma aplicação não envia “um arquivo pela Internet” de uma só vez. O sistema operacional divide os dados
+                em unidades menores, identifica origem e destino e encaminha cada unidade pela interface de rede.
+                Switches encaminham quadros dentro da rede local; roteadores encaminham pacotes entre redes.
+              </p>
+              <div class="network-flow" role="img" aria-label="Computador conectado ao switch, ao gateway e ao servidor de destino">
+                <div class="network-flow-node"><small>ORIGEM</small><strong>PC</strong><span>192.168.10.25</span></div>
+                <span class="network-flow-link" aria-hidden="true"></span>
+                <div class="network-flow-node"><small>CAMADA 2</small><strong>Switch</strong><span>encaminha por MAC</span></div>
+                <span class="network-flow-link" aria-hidden="true"></span>
+                <div class="network-flow-node"><small>CAMADA 3</small><strong>Gateway</strong><span>192.168.10.1</span></div>
+                <span class="network-flow-link" aria-hidden="true"></span>
+                <div class="network-flow-node destination"><small>DESTINO</small><strong>Servidor</strong><span>10.20.4.18</span></div>
+              </div>
+
+              <div class="lesson-concepts">
+                <section>
+                  <h3>LAN, WAN e Internet</h3>
+                  <p><strong>LAN</strong> conecta dispositivos em uma área local, como um escritório. <strong>WAN</strong> interliga redes geograficamente separadas. A Internet é uma rede global de redes; estar conectado ao Wi-Fi, portanto, não prova que haja acesso à Internet.</p>
+                </section>
+                <section>
+                  <h3>Endereço IP e endereço MAC</h3>
+                  <p>O <strong>IP</strong> identifica a origem e o destino lógico para que roteadores encaminhem pacotes entre redes. O <strong>MAC</strong> identifica uma interface no enlace local. O IP de destino permanece relevante ao longo da rota; os endereços MAC do quadro mudam a cada salto de camada 2.</p>
+                </section>
+                <section>
+                  <h3>O que cada equipamento decide</h3>
+                  <p>O switch aprende quais MACs estão em cada porta e encaminha quadros dentro da VLAN. O roteador consulta sua tabela de rotas e escolhe o próximo salto. O gateway padrão é o roteador usado pelo host quando o destino está fora da sub-rede local.</p>
+                </section>
+              </div>
+
+              <div class="worked-example">
+                <p class="worked-example-label">Cenário resolvido</p>
+                <h3>Um computador acessa um servidor interno</h3>
+                <ol>
+                  <li>O PC <code>192.168.10.25/24</code> compara seu endereço com o destino <code>10.20.4.18</code> e conclui que estão em redes diferentes.</li>
+                  <li>Ele envia o quadro ao MAC do gateway <code>192.168.10.1</code>, mas mantém o IP do servidor como destino do pacote.</li>
+                  <li>O roteador consulta a rota para <code>10.20.4.0/24</code> e encaminha o pacote ao próximo salto.</li>
+                  <li>O servidor responde; a resposta percorre a rota de volta. Uma rota de retorno ausente também pode quebrar a comunicação.</li>
+                </ol>
+                <p><strong>Conclusão de suporte:</strong> se o PC alcança o gateway, mas não o servidor, a conexão local já foi validada. A investigação deve avançar para rota, ACL/firewall, serviço e caminho de retorno.</p>
+              </div>
+
+              <details class="knowledge-check">
+                <summary>Checagem: o destino está em outra sub-rede. Para qual MAC o PC envia o primeiro quadro?</summary>
+                <p>Para o MAC do gateway padrão. O quadro atravessa o enlace local até o roteador; o pacote IP continua endereçado ao destino final.</p>
+              </details>
+            </article>
+
+            <aside class="lesson-reference">
+              <h2>Ao final desta aula</h2>
+              <ul>
+                <li>Distinguir LAN, WAN e Internet.</li>
+                <li>Explicar a diferença entre IP e MAC.</li>
+                <li>Separar a função de switch e roteador.</li>
+                <li>Descrever por que um host precisa de gateway.</li>
+              </ul>
+              <div class="reference-rule"></div>
+              <p class="reference-label">Próxima etapa</p>
+              <p>Use as abas da trilha para estudar endereçamento IPv4, serviços e diagnóstico em Windows.</p>
+              <a href="#modulos" class="reference-link">Abrir as aulas da trilha</a>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="ambiente" class="section alt-bg">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Ambiente de prática</p>
+            <h2>Simule um terminal Windows para validar sua lógica</h2>
+          </div>
+
+          <div class="practice-grid">
+            <div class="terminal-panel">
+              <div class="terminal-header">
+                <div class="terminal-dots">
+                  <span class="dot red"></span>
+                  <span class="dot yellow"></span>
+                  <span class="dot green"></span>
+                </div>
+                <span>CMD • Laboratório de Redes</span>
+              </div>
+              <div id="terminal-output" class="terminal-output" aria-live="polite">
+                <p>Microsoft Windows [versão 10.0.0]</p>
+                <p>(c) 2026 Curso de Redes para Suporte</p>
+                <p>Digite help para ver os comandos disponíveis.</p>
+              </div>
+              <form id="terminal-form" class="terminal-form">
+                <span class="prompt">C:\curso&gt;</span>
+                <input id="terminal-input" type="text" placeholder="Ex.: ipconfig, ping localhost, tracert 8.8.8.8" autocomplete="off" />
+              </form>
+            </div>
+
+            <div class="status-panel">
+              <div class="status-box">
+                <p class="eyebrow">Validação</p>
+                <h3 id="terminal-status">Comando em andamento</h3>
+                <p id="terminal-feedback">Se o comando estiver correto, o sistema confirma automaticamente e salva a evolução do módulo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="raciocinio" class="section">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Pense antes de executar</p>
+            <h2>Fluxo de raciocínio profissional</h2>
+          </div>
+
+          <div class="flow-grid">
+            <div class="flow-step">
+              <span>1</span>
+              <h3>Cenário</h3>
+              <p>O que o usuário está relatando?</p>
+            </div>
+            <div class="flow-step">
+              <span>2</span>
+              <h3>O que sabemos</h3>
+              <p>Informações já disponíveis.</p>
+            </div>
+            <div class="flow-step">
+              <span>3</span>
+              <h3>O que não sabemos</h3>
+              <p>O que falta confirmar.</p>
+            </div>
+            <div class="flow-step">
+              <span>4</span>
+              <h3>Hipóteses</h3>
+              <p>Quais causas são prováveis?</p>
+            </div>
+            <div class="flow-step">
+              <span>5</span>
+              <h3>Primeiro teste</h3>
+              <p>Qual teste elimina mais hipóteses?</p>
+            </div>
+            <div class="flow-step">
+              <span>6</span>
+              <h3>Validar</h3>
+              <p>Resultado confirma ou descarta a causa.</p>
+            </div>
+          </div>
+
+          <div class="diagnostic-panel">
+            <div class="diagnostic-copy">
+              <p class="eyebrow">Roteiro de suporte</p>
+              <h3>Como um técnico N2 organiza a investigação</h3>
+              <ul>
+                <li>Confirma se o problema é isolado ao usuário, ao segmento ou à aplicação.</li>
+                <li>Verifica endereço IP, gateway, DNS, rota e porta alvo antes de alterar configuração.</li>
+                <li>Testa a camada imediatamente acima do erro para evitar correções aleatórias.</li>
+                <li>Documenta a causa, a correção e a validação para reforçar conhecimento e repetir sem erro.</li>
+              </ul>
+            </div>
+            <div class="diagnostic-stack">
+              <div class="mini-card">1. Sintoma</div>
+              <div class="mini-card">2. Hipótese</div>
+              <div class="mini-card">3. Teste</div>
+              <div class="mini-card">4. Conclusão</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt-bg">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Nível N1 × N2</p>
+            <h2>Como pensar como analista N2</h2>
+          </div>
+
+          <div class="comparison-grid">
+            <div class="comparison-box negative">
+              <h3>N1 superficial</h3>
+              <p>“O sistema não funciona.”</p>
+            </div>
+            <div class="comparison-box positive">
+              <h3>N2 profissional</h3>
+              <p>
+                “O usuário consegue resolver o nome do servidor e alcançar o gateway. O servidor responde ao ICMP,
+                porém a conexão TCP na porta da aplicação não é estabelecida. O próximo ponto de investigação é a
+                disponibilidade do serviço, firewall ou política de rede.”
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="diagramas" class="section">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Diagramas didáticos</p>
+            <h2>Entendendo a comunicação em camadas</h2>
+          </div>
+
+          <div class="diagram-grid">
+            <article class="diagram-card">
+              <h3>Rede local</h3>
+              <svg viewBox="0 0 400 220" aria-label="Diagrama do caminho do usuário até o servidor">
+                <rect x="20" y="80" width="70" height="60" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="55" y="115" text-anchor="middle" font-size="13" fill="#0f172a">PC</text>
+                <rect x="140" y="80" width="90" height="60" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="185" y="115" text-anchor="middle" font-size="13" fill="#0f172a">Switch</text>
+                <rect x="270" y="80" width="95" height="60" rx="8" fill="#fef3c7" stroke="#d97706"/>
+                <text x="317" y="115" text-anchor="middle" font-size="12" fill="#0f172a">Gateway</text>
+                <path d="M90 110 L140 110 M230 110 L270 110" stroke="#475569" stroke-width="2"/>
+                <path d="M365 110 L390 110 L390 175 L10 175 L10 150" stroke="#475569" stroke-width="2" fill="none"/>
+                <rect x="150" y="170" width="120" height="35" rx="8" fill="#f3e8ff" stroke="#7c3aed"/>
+                <text x="210" y="192" text-anchor="middle" font-size="12" fill="#0f172a">Servidor</text>
+              </svg>
+            </article>
+
+            <article class="diagram-card">
+              <h3>DNS</h3>
+              <svg viewBox="0 0 400 220" aria-label="Processo de resolução de nomes DNS">
+                <rect x="20" y="90" width="70" height="55" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="55" y="122" text-anchor="middle" font-size="12">Cliente</text>
+                <rect x="165" y="90" width="90" height="55" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="210" y="122" text-anchor="middle" font-size="12">DNS</text>
+                <rect x="300" y="90" width="80" height="55" rx="8" fill="#fef3c7" stroke="#d97706"/>
+                <text x="340" y="122" text-anchor="middle" font-size="12">Web</text>
+                <path d="M90 115 L165 115 M255 115 L300 115" stroke="#475569" stroke-width="2"/>
+                <text x="115" y="95" font-size="11">consulta</text>
+                <text x="268" y="95" font-size="11">resposta</text>
+              </svg>
+            </article>
+
+            <article class="diagram-card">
+              <h3>DHCP DORA</h3>
+              <svg viewBox="0 0 400 220" aria-label="Fluxo DORA do DHCP">
+                <rect x="20" y="90" width="80" height="60" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="60" y="120" text-anchor="middle" font-size="12">Cliente</text>
+                <rect x="300" y="90" width="80" height="60" rx="8" fill="#f3e8ff" stroke="#7c3aed"/>
+                <text x="340" y="120" text-anchor="middle" font-size="12">DHCP</text>
+                <path d="M100 100 L300 100" stroke="#475569" stroke-width="2"/>
+                <path d="M300 145 L100 145" stroke="#475569" stroke-width="2"/>
+                <text x="165" y="90" font-size="11">Discover</text>
+                <text x="170" y="162" font-size="11">Offer</text>
+                <text x="165" y="84" font-size="11">Request</text>
+                <text x="170" y="170" font-size="11">Acknowledge</text>
+              </svg>
+            </article>
+
+            <article class="diagram-card">
+              <h3>Handshake TCP</h3>
+              <svg viewBox="0 0 400 220" aria-label="Handshake TCP">
+                <rect x="20" y="80" width="80" height="60" rx="8" fill="#dbeafe" stroke="#2563eb"/>
+                <text x="60" y="115" text-anchor="middle" font-size="12">Cliente</text>
+                <rect x="300" y="80" width="80" height="60" rx="8" fill="#dcfce7" stroke="#16a34a"/>
+                <text x="340" y="115" text-anchor="middle" font-size="12">Servidor</text>
+                <path d="M100 100 L300 100" stroke="#475569" stroke-width="2"/>
+                <path d="M300 140 L100 140" stroke="#475569" stroke-width="2"/>
+                <text x="150" y="92" font-size="11">SYN</text>
+                <text x="150" y="152" font-size="11">SYN-ACK</text>
+                <text x="155" y="124" font-size="11">ACK</text>
+              </svg>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section dark">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow alt">Linha de raciocínio</p>
+            <h2>Exemplo prático: usuário sem Internet</h2>
+          </div>
+
+          <div class="reasoning-box">
+            <article class="reason-card">
+              <h3>Cenário</h3>
+              <p>Notebook conectado ao Wi‑Fi, mas sem Internet.</p>
+            </article>
+            <article class="reason-card">
+              <h3>O que sabemos</h3>
+              <p>Wi‑Fi aparece conectado, alguns sites não carregam e outros funcionam.</p>
+            </article>
+            <article class="reason-card">
+              <h3>Hipóteses</h3>
+              <p>DHCP falhando, VLAN errada, gateway incorreto, DNS ou bloqueio de firewall.</p>
+            </article>
+            <article class="reason-card">
+              <h3>Primeiro teste</h3>
+              <p>Verificar IP, gateway e DNS com ipconfig ou Get-NetIPConfiguration.</p>
+            </article>
+            <article class="reason-card">
+              <h3>Interpretação</h3>
+              <p>Se o IP for 169.254.x.x, a falha é provavelmente de DHCP ou de segmento.</p>
+            </article>
+            <article class="reason-card">
+              <h3>Próximo passo</h3>
+              <p>Testar ping ao gateway e verificar porta 443 e resolução de nomes.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="modulos" class="section">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Módulos</p>
+            <h2>Estrutura do curso</h2>
+          </div>
+
+          <div class="module-tabs">
+            <button class="tab-btn active" data-target="tab1">Fundamentos</button>
+            <button class="tab-btn" data-target="tab2">IPv4 e subnetting</button>
+            <button class="tab-btn" data-target="tab3">TCP/UDP/DNS</button>
+            <button class="tab-btn" data-target="tab4">Firewall/VPN/Wi‑Fi</button>
+            <button class="tab-btn" data-target="tab5">PowerShell</button>
+          </div>
+
+          <div class="tab-panels">
+            <article class="tab-panel active" id="tab1">
+              <div class="lesson-body">
+                <p class="lesson-sequence">MÓDULO 01 <span>•</span> BASE DE REDES</p>
+                <h3>Fundamentos: camadas e encapsulamento</h3>
+                <p>O modelo OSI é uma ferramenta para localizar responsabilidades; não é uma lista de etapas que um técnico executa mecanicamente. Na prática, a pilha TCP/IP agrupa funções, mas o raciocínio por camadas ajuda a limitar onde procurar uma falha.</p>
+                <div class="layer-list">
+                  <p><strong>Aplicação</strong><span>HTTP, DNS, SMB: o que a aplicação solicita.</span></p>
+                  <p><strong>Transporte</strong><span>TCP ou UDP, portas e comunicação entre processos.</span></p>
+                  <p><strong>Internet</strong><span>IP, prefixos e roteamento entre redes.</span></p>
+                  <p><strong>Enlace e físico</strong><span>Ethernet/Wi-Fi, quadros, MAC, sinal e meio.</span></p>
+                </div>
+                <h4>Encapsulamento em uma requisição web</h4>
+                <p>O navegador cria dados HTTP. O TCP acrescenta portas e controle de entrega; o IP acrescenta endereços lógicos; Ethernet ou Wi-Fi cria o quadro para o próximo salto. No destino, cada camada remove e interpreta seu cabeçalho. Um problema de DNS pode impedir a conexão antes mesmo de existir uma sessão TCP com o servidor.</p>
+                <div class="worked-example">
+                  <p class="worked-example-label">Exemplo de diagnóstico</p>
+                  <p>O usuário abre <code>https://intranet.empresa.local</code>, mas recebe erro de nome. Primeiro valide a resolução com <code>Resolve-DnsName intranet.empresa.local</code>. Se o nome resolve para o IP esperado, teste a porta TCP 443; não comece alterando o firewall sem evidência.</p>
+                </div>
+                <details class="knowledge-check"><summary>Checagem: o ping ao gateway funciona, mas o nome da intranet não resolve. Qual camada investigar primeiro?</summary><p>Resolução DNS, na camada de aplicação do modelo TCP/IP. Confirme o servidor DNS configurado, a resposta do nome e se o registro aponta para o endereço esperado.</p></details>
+              </div>
+            </article>
+
+            <article class="tab-panel" id="tab2">
+              <div class="lesson-body">
+                <p class="lesson-sequence">MÓDULO 02 <span>•</span> ENDEREÇAMENTO</p>
+                <h3>IPv4 e subnetting com cálculo aplicado</h3>
+                <p>Um endereço IPv4 tem 32 bits. O prefixo CIDR informa quantos bits pertencem à rede; os restantes identificam endereços dentro daquela sub-rede. A máscara pontuada é outra forma de representar a mesma divisão.</p>
+                <h4>Exemplo resolvido: <code>192.168.10.70/26</code></h4>
+                <ol class="calculation-steps">
+                  <li><strong>Prefixo:</strong> /26 deixa 6 bits para hosts. Máscara: <code>255.255.255.192</code>.</li>
+                  <li><strong>Tamanho do bloco:</strong> no último octeto, <code>256 - 192 = 64</code>. As redes começam em 0, 64, 128 e 192.</li>
+                  <li><strong>Rede do IP .70:</strong> está no intervalo de 64 a 127; endereço de rede <code>192.168.10.64</code>.</li>
+                  <li><strong>Broadcast e hosts:</strong> broadcast <code>192.168.10.127</code>; hosts utilizáveis <code>.65–.126</code>, total de 62 endereços.</li>
+                </ol>
+                <div class="worked-example"><p class="worked-example-label">Interpretação operacional</p><p>Um host <code>192.168.10.100/26</code> está na mesma sub-rede de <code>.70</code>; o host <code>192.168.10.130/26</code> não está. Eles precisam de roteamento para se comunicar. O gateway deve ser um endereço de host válido no mesmo prefixo, conforme o plano da rede.</p></div>
+                <p>Endereços privados usados com frequência: <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code> e <code>192.168.0.0/16</code>. Endereço privado não é roteável diretamente na Internet; redes domésticas e corporativas normalmente usam NAT na borda.</p>
+                <details class="knowledge-check"><summary>Checagem: qual é o broadcast da sub-rede de <code>10.20.30.150/27</code>?</summary><p>/27 usa blocos de 32 endereços. O intervalo que contém .150 começa em .128 e termina em .159; broadcast .159, hosts .129 a .158.</p></details>
+              </div>
+            </article>
+
+            <article class="tab-panel" id="tab3">
+              <div class="lesson-body">
+                <p class="lesson-sequence">MÓDULO 03 <span>•</span> SERVIÇOS</p>
+                <h3>TCP, UDP, DNS e DHCP</h3>
+                <h4>TCP ou UDP?</h4>
+                <p>TCP estabelece uma conexão, numera dados e retransmite segmentos perdidos; é comum em HTTPS e SMB. UDP envia datagramas sem estabelecer essa sessão; reduz controle e pode ser útil em DNS, voz e vídeo. A aplicação define como lida com perda, ordem e repetição.</p>
+                <p><strong>Timeout</strong> significa que não houve resposta dentro do prazo; pode envolver rota, filtro silencioso, servidor indisponível ou retorno perdido. <strong>Connection refused</strong> normalmente indica que o destino foi alcançado, mas a porta não aceita a sessão. Um <strong>reset</strong> encerra uma sessão abruptamente. São pistas, não diagnóstico final.</p>
+                <h4>DNS traduz nomes em registros</h4>
+                <p>O cliente consulta um resolvedor configurado. A resposta pode vir do cache ou de servidores DNS autoritativos. Registros comuns: A (IPv4), AAAA (IPv6), CNAME (alias) e MX (correio). Teste o nome e o endereço separadamente: uma aplicação pode falhar mesmo com DNS saudável.</p>
+                <h4>DHCP entrega configuração de rede</h4>
+                <p>O fluxo DORA é Discover, Offer, Request e Acknowledge. O cliente descobre servidores, escolhe uma oferta e recebe concessão com IP, máscara, gateway, DNS e duração. Um APIPA <code>169.254.0.0/16</code> sugere que o cliente não recebeu configuração IPv4 por DHCP, mas não identifica sozinho a causa.</p>
+                <div class="port-reference"><p><strong>Portas para reconhecer</strong></p><p><code>53 TCP/UDP</code> DNS · <code>67/68 UDP</code> DHCP · <code>80 TCP</code> HTTP · <code>443 TCP</code> HTTPS · <code>3389 TCP</code> RDP. Firewalls podem alterar o caminho; confirme a política do ambiente.</p></div>
+                <details class="knowledge-check"><summary>Checagem: DNS resolve o nome e ping responde, mas a aplicação HTTPS expira. O que testar?</summary><p>Teste especificamente a conexão TCP à porta 443, por exemplo com <code>Test-NetConnection servidor -Port 443</code>. Depois investigue serviço, firewall/ACL e rota de retorno conforme o resultado.</p></details>
+              </div>
+            </article>
+
+            <article class="tab-panel" id="tab4">
+              <div class="lesson-body">
+                <p class="lesson-sequence">MÓDULO 04 <span>•</span> ACESSO E SEGURANÇA</p>
+                <h3>Firewall, VPN e Wi‑Fi</h3>
+                <h4>Leia uma regra de firewall como uma tupla</h4>
+                <p>Uma regra normalmente considera origem, destino, protocolo, porta, direção e ação. “Liberar HTTPS” é impreciso: é necessário saber de qual origem para qual destino, em que ponto da rede e em qual sentido. Firewalls stateful acompanham sessões e permitem o tráfego de retorno correspondente; ACLs stateless avaliam cada pacote conforme as regras configuradas.</p>
+                <div class="worked-example"><p class="worked-example-label">Caso: site interno não abre</p><ol><li>Confirme o nome e o IP resolvido.</li><li>Teste o destino e a porta TCP da aplicação.</li><li>Compare o resultado com outro usuário ou segmento autorizado.</li><li>Peça validação de logs e regra ao responsável pela rede; não crie uma liberação ampla para “testar”.</li></ol></div>
+                <h4>VPN e acesso remoto</h4>
+                <p>Uma VPN cria um túnel autenticado e criptografado. Em túnel completo, o tráfego do cliente passa pela rede corporativa; em split tunnel, somente destinos definidos usam o túnel. Rotas e DNS corporativos precisam acompanhar a política: estar “conectado à VPN” não garante que o recurso esteja roteável ou autorizado.</p>
+                <h4>Wi‑Fi: associação não é conectividade ponta a ponta</h4>
+                <p>O cliente associa-se a um ponto de acesso e autentica-se; depois ainda precisa de VLAN, DHCP, gateway, DNS e acesso ao destino. 2,4 GHz costuma oferecer maior alcance e mais interferência; 5 e 6 GHz podem oferecer mais capacidade a distâncias menores e dependem de compatibilidade e regulamentação local. Canal, largura, potência e roaming devem ser avaliados no ambiente real.</p>
+                <details class="knowledge-check"><summary>Checagem: apenas usuários de uma VLAN não chegam à aplicação. Onde procurar evidências?</summary><p>Compare IP, gateway e rota desse segmento; verifique ACL/firewall entre origem e destino, logs de bloqueio e rota de retorno. O escopo por VLAN é uma pista para segmentação ou política, não prova de que o switch está com defeito.</p></details>
+              </div>
+            </article>
+
+            <article class="tab-panel" id="tab5">
+              <div class="lesson-body">
+                <p class="lesson-sequence">MÓDULO 05 <span>•</span> FERRAMENTAS WINDOWS</p>
+                <h3>PowerShell para diagnóstico de rede</h3>
+                <p>Execute uma pergunta por vez, registre o resultado e compare com um destino conhecido. Os cmdlets abaixo são somente leitura ou testes de conectividade; no ambiente corporativo, respeite autorização, janela de mudança e política local.</p>
+                <div class="command-reference">
+                  <p><code>Get-NetIPConfiguration</code><span>Mostra IP, gateway e DNS de cada interface.</span></p>
+                  <p><code>Get-NetRoute -DestinationPrefix 0.0.0.0/0</code><span>Exibe rotas padrão e seus próximos saltos.</span></p>
+                  <p><code>Resolve-DnsName app.empresa.local</code><span>Consulta registros DNS do nome informado.</span></p>
+                  <p><code>Test-NetConnection app.empresa.local -Port 443</code><span>Testa resolução e abertura de conexão TCP na porta.</span></p>
+                  <p><code>Get-NetTCPConnection -State Established</code><span>Lista sessões TCP estabelecidas no computador.</span></p>
+                </div>
+                <h4>Roteiro de diagnóstico: “a aplicação não abre”</h4>
+                <ol class="calculation-steps"><li>Confirme configuração local e interface ativa.</li><li>Resolva o nome e compare o IP com a referência correta.</li><li>Teste a porta usada pela aplicação; ping não testa a porta.</li><li>Se falhar, registre horário, origem, destino, porta e saída do comando para a equipe responsável.</li><li>Depois de uma correção autorizada, repita o mesmo teste e confirme com o usuário.</li></ol>
+                <div class="worked-example"><p class="worked-example-label">Interpretação</p><p><code>TcpTestSucceeded : False</code> significa que a conexão TCP testada não foi estabelecida. Isso não distingue, por si só, bloqueio de firewall, serviço parado, rota ausente ou host indisponível.</p></div>
+                <details class="knowledge-check"><summary>Checagem: o ping falha, mas <code>Test-NetConnection servidor -Port 443</code> retorna True. O HTTPS pode funcionar?</summary><p>Sim. ICMP pode estar bloqueado enquanto TCP/443 está permitido. O teste de porta fornece evidência mais direta para essa aplicação, mas ainda não substitui a validação no navegador ou no cliente real.</p></details>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section alt-bg">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Checklist de competência</p>
+            <h2>O que você precisa dominar</h2>
+          </div>
+
+          <div class="skills-grid">
+            <div class="skill-pill">TCP/IP</div>
+            <div class="skill-pill">IPv4</div>
+            <div class="skill-pill">Subnetting</div>
+            <div class="skill-pill">CIDR</div>
+            <div class="skill-pill">TCP/UDP</div>
+            <div class="skill-pill">Portas</div>
+            <div class="skill-pill">DNS</div>
+            <div class="skill-pill">DHCP</div>
+            <div class="skill-pill">ARP</div>
+            <div class="skill-pill">Switch</div>
+            <div class="skill-pill">VLAN</div>
+            <div class="skill-pill">Routing</div>
+            <div class="skill-pill">Firewall</div>
+            <div class="skill-pill">VPN</div>
+            <div class="skill-pill">HTTP/HTTPS</div>
+            <div class="skill-pill">PowerShell</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="progresso" class="section">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Progresso e armazenamento</p>
+            <h2>Meu painel de estudo pessoal</h2>
+          </div>
+
+          <div class="progress-grid">
+            <div class="progress-panel">
+              <div class="progress-head">
+                <span>Progresso total</span>
+                <strong id="progressValue">0%</strong>
+              </div>
+              <div class="progress-bar">
+                <span id="progressFill"></span>
+              </div>
+              <div id="moduleProgressList" class="module-progress-list"></div>
+            </div>
+
+            <div class="database-panel">
+              <p class="eyebrow">Banco local</p>
+              <h3>Salvar anotações e aprendizados</h3>
+              <textarea id="studyNote" placeholder="Escreva seus aprendizados, dúvidas e próximos passos..."></textarea>
+              <button id="saveNote" class="primary-btn">Salvar conteúdo</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="aulas-avancadas" class="section alt-bg">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Aulas avançadas</p>
+            <h2>Conteúdo mais profundo para suporte e arquitetura</h2>
+          </div>
+
+          <div class="advanced-grid">
+            <article class="advanced-card" data-module="vlan">
+              <h3>VLAN e switching</h3>
+              <p>Entenda segmentação, domínios de broadcast, trunk, acesso e propagação de falhas.</p>
+              <button class="chip-button" data-module-toggle="vlan">Marcar como estudado</button>
+            </article>
+            <article class="advanced-card" data-module="dhcp">
+              <h3>DHCP, DORA e leasing</h3>
+              <p>Analise distribuição de IP, conflitos, escopo, concessão e problemas de rede local.</p>
+              <button class="chip-button" data-module-toggle="dhcp">Marcar como estudado</button>
+            </article>
+            <article class="advanced-card" data-module="ospf">
+              <h3>OSPF e roteamento dinâmico</h3>
+              <p>Aprenda adjacências, cost metrics, áreas e causas de rota inexistente ou instável.</p>
+              <button class="chip-button" data-module-toggle="ospf">Marcar como estudado</button>
+            </article>
+            <article class="advanced-card" data-module="firewall">
+              <h3>Firewall e ACL</h3>
+              <p>Desvende regras permitidas, bloqueadas e o impacto de políticas de segurança em serviços.</p>
+              <button class="chip-button" data-module-toggle="firewall">Marcar como estudado</button>
+            </article>
+            <article class="advanced-card" data-module="vpn">
+              <h3>VPN e acesso remoto</h3>
+              <p>Entenda tunelamento, criptografia, autenticação e falhas de conectividade externa.</p>
+              <button class="chip-button" data-module-toggle="vpn">Marcar como estudado</button>
+            </article>
+            <article class="advanced-card" data-module="wifi">
+              <h3>Wi‑Fi 802.11 e interferência</h3>
+              <p>Veja canais, potência, roaming, SSID e desempenho em ambientes com muitos dispositivos.</p>
+              <button class="chip-button" data-module-toggle="wifi">Marcar como estudado</button>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="exercicios" class="section">
+        <div class="container">
+          <div class="section-header">
+            <p class="eyebrow">Exercícios práticos</p>
+            <h2>Treine o raciocínio técnico com cenários reais</h2>
+          </div>
+
+          <div class="exercise-grid">
+            <article class="exercise-card">
+              <span class="exercise-tag">Exercício 01</span>
+              <h3>Usuário sem internet</h3>
+              <p>O computador mostra Wi‑Fi conectado, mas as páginas não abrem. O IP do cliente é 169.254.20.12.</p>
+              <ul>
+                <li>O que isso indica?</li>
+                <li>Qual é a primeira causa a confirmar?</li>
+                <li>Qual comando você usaria?</li>
+              </ul>
+            </article>
+
+            <article class="exercise-card">
+              <span class="exercise-tag">Exercício 02</span>
+              <h3>Servidor interno inacessível</h3>
+              <p>O site interno responde somente pelo IP e não pelo nome de host.</p>
+              <ul>
+                <li>Qual camada você suspeita primeiro?</li>
+                <li>Qual teste confirma a hipótese de DNS?</li>
+                <li>Qual ação se o ping ao IP funcionar?</li>
+              </ul>
+            </article>
+
+            <article class="exercise-card">
+              <span class="exercise-tag">Exercício 03</span>
+              <h3>Conexão TCP recusada</h3>
+              <p>O cliente consegue pingar o servidor, mas a aplicação não abre na porta 443.</p>
+              <ul>
+                <li>Qual é a diferença entre timeout e refused?</li>
+                <li>O que você verificaria em seguida?</li>
+                <li>Como documentaria a causa?</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="quiz-box" id="quiz-box">
+            <div class="section-header left-align quiz-header">
+              <p class="eyebrow">Quiz rápido</p>
+              <h2>Teste seu entendimento</h2>
+            </div>
+            <div id="quiz"></div>
+            <button id="submit-quiz" class="primary-btn quiz-btn">Verificar respostas</button>
+            <div id="quiz-result" class="quiz-result" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="challenge" class="section">
+        <div class="container challenge-wrap">
+          <div class="section-header left-align">
+            <p class="eyebrow">Desafio</p>
+            <h2>Qual teste você faria primeiro?</h2>
+          </div>
+
+          <div class="challenge-card">
+            <p>
+              O usuário diz: “O sistema financeiro não abre. A internet funciona e outros sites abrem. O sistema é interno.
+              Quando tento pelo hostname, não abre.”
+            </p>
+            <ul>
+              <li>Qual seria sua primeira hipótese?</li>
+              <li>Qual teste faria primeiro?</li>
+              <li>Como interpretaria o resultado?</li>
+            </ul>
+            <div class="answer-box">
+              <strong>Resposta esperada:</strong>
+              <p>
+                A hipótese mais provável é DNS, porque a internet funciona e o problema é específico de um sistema interno.
+                O primeiro teste adequado é verificar a resolução do nome com nslookup ou Resolve-DnsName, e depois verificar
+                se o IP do servidor responde na porta correta.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-wrap">
+        <div>
+          <strong>Curso de Redes</strong>
+          <p>Aprendizado prático para suporte N1/N2.</p>
+        </div>
+        <a href="#inicio">Voltar ao topo</a>
+      </div>
+    </footer>
+
+    <script src="app.js?v=4"></script>
+  </body>
+</html>
