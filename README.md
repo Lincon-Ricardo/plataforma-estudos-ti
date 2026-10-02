@@ -12,6 +12,14 @@ python -m http.server 9002
 
 Abra `http://localhost:9002/`. Se a porta estiver ocupada, use outra e atualize o endereço.
 
+## Abrir pelo navegador
+
+O GitHub Pages publica a aplicação em:
+
+`https://lincon-ricardo.github.io/plataforma-estudos-ti/`
+
+O workflow `.github/workflows/pages.yml` publica automaticamente quando há push no branch `main`. A primeira publicação pode levar alguns minutos. Perfil e progresso ficam no armazenamento local do navegador usado para abrir o site.
+
 ## O que funciona neste MVP
 
 - Perfis locais separados por nome, retomada do usuário anterior e preferências de tema.
