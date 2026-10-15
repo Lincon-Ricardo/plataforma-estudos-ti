@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+body { @apply bg-base text-slate-100 antialiased; }
+.card { @apply bg-panel border border-white/10 rounded-2xl p-5; }
+.btn-primary { @apply bg-emerald-500 hover:bg-emerald-400 text-black font-semibold rounded-xl px-4 py-2.5 transition disabled:opacity-40; }
+.btn-ghost { @apply border border-white/15 hover:border-white/30 rounded-xl px-4 py-2.5 transition; }
+.input { @apply w-full bg-black/30 border border-white/15 rounded-xl px-3 py-2 outline-none focus:border-emerald-400; }
+.label { @apply text-xs uppercase tracking-wider text-muted; }
+.navlink { @apply flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-300 hover:bg-white/5 hover:text-white transition; }
+.navlink-active { @apply bg-emerald-500/15 text-emerald-300; }
+.quiz-opt { @apply block border border-white/10 rounded-xl px-3 py-2 my-2 cursor-pointer hover:border-emerald-400/60 transition; }
