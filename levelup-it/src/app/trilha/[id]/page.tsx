@@ -4,96 +4,161 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { lessonById, useStore } from "@/lib/store";
 import { LESSONS } from "@/lib/seed-tracks";
+import { LessonVisual, MODULE_HUE } from "@/components/diagrams";
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
   const lesson = lessonById(id);
   const { store, recordAttempt, completeLesson, scheduleReview } = useStore();
+
+  const [checks, setChecks] = useState<boolean[]>([]);
+  const [qi, setQi] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [revealed, setRevealed] = useState(false);
-  const [result, setResult] = useState<string>("");
-  const [showAnswer, setShowAnswer] = useState<Record<string, boolean>>({});
+  const [finished, setFinished] = useState(false);
+  const [result, setResult] = useState("");
+  const [showWhy, setShowWhy] = useState(false);
 
   const done = !!store.completedLessons[id];
-
-  const grade = () => {
-    if (!lesson) return;
-    if (Object.keys(answers).length < lesson.quiz.length) { setResult("Responda todas as questões antes de verificar."); return; }
-    let correct = 0;
-    lesson.quiz.forEach((q) => { if (answers[q.id] === q.answer) correct++; });
-    const score = Math.round((correct / lesson.quiz.length) * 100);
-    recordAttempt({ lessonId: lesson.id, score, total: lesson.quiz.length, correct, kind: "lesson" });
-    scheduleReview(lesson.id, score);
-    setRevealed(true);
-    if (score >= 80) { completeLesson(lesson.id); setResult(`Aprovado: ${score}% (${correct}/${lesson.quiz.length}). Aula concluída e revisão agendada.`); }
-    else setResult(`Nota ${score}% — abaixo de 80%. Revise o resumo e tente de novo; revisão agendada para amanhã.`);
-  };
+  const hue = lesson ? MODULE_HUE[lesson.moduleId] ?? "#61c3b6" : "#61c3b6";
 
   const next = useMemo(() => {
     if (!lesson) return null;
     const mod = LESSONS.filter((l) => l.moduleId === lesson.moduleId && l.status === "ready");
-    const i = mod.findIndex((l) => l.id === lesson.id);
-    return mod[i + 1] ?? null;
+    return mod[mod.findIndex((l) => l.id === lesson.id) + 1] ?? null;
   }, [lesson]);
 
   if (!lesson) return <div className="space-y-3"><p>Aula não encontrada.</p><Link href="/trilha" className="btn-ghost inline-block">Voltar à trilha</Link></div>;
 
+  const q = lesson.quiz[qi];
+  const checkedCount = checks.filter(Boolean).length;
+
+  const answer = (opt: number) => {
+    if (answers[q.id] !== undefined) return;
+    setAnswers((a) => ({ ...a, [q.id]: opt }));
+  };
+
+  const advance = () => {
+    setShowWhy(false);
+    if (qi + 1 < lesson.quiz.length) setQi(qi + 1);
+    else {
+      let correct = 0;
+      lesson.quiz.forEach((x) => { if (answers[x.id] === x.answer) correct++; });
+      const score = Math.round((correct / lesson.quiz.length) * 100);
+      recordAttempt({ lessonId: lesson.id, score, total: lesson.quiz.length, correct, kind: "lesson" });
+      scheduleReview(lesson.id, score);
+      setFinished(true);
+      if (score >= 80) { completeLesson(lesson.id); setResult(`Aprovado: ${score}% (${correct}/${lesson.quiz.length}). Aula concluída e revisão agendada.`); }
+      else setResult(`Nota ${score}% — abaixo de 80%. Revise o resumo e refaça; revisão reagendada para amanhã.`);
+    }
+  };
+
+  const retry = () => { setAnswers({}); setQi(0); setFinished(false); setResult(""); setShowWhy(false); };
+
   return (
-    <article className="space-y-5">
-      <p className="label">Aula · {done ? "concluída ✓" : "em andamento"}</p>
-      <h1 className="text-2xl font-bold">{lesson.title}</h1>
+    <article className="space-y-4 max-w-3xl">
+      <div className="rounded border border-line bg-panel p-6" style={{ borderTop: `4px solid ${hue}` }}>
+        <p className="label">{done ? "Aula concluída ✓" : "Aula"} · {lesson.quiz.length} verificações · {lesson.demo.length} passos práticos</p>
+        <h1 className="text-2xl font-extrabold">{lesson.title}</h1>
+        <p className="text-sm text-muted mt-2"><strong className="text-bodytext">Objetivo:</strong> {lesson.objective}</p>
+      </div>
 
-      <section className="card"><p className="label">1 · Objetivo</p><p>{lesson.objective}</p></section>
+      <LessonVisual id={lesson.id} moduleId={lesson.moduleId} />
 
-      <section className="card"><p className="label">2 · Explicação progressiva</p>
-        {lesson.explanation.map((p, i) => <p key={i} className="mb-2 text-[15px] leading-relaxed">{p}</p>)}
+      <section className="card">
+        <p className="label">O essencial</p>
+        <p className="text-[15px] leading-relaxed">{lesson.explanation[0]}</p>
+        {lesson.explanation.length > 1 && (
+          <details className="mt-2">
+            <summary className="cursor-pointer text-sm font-semibold" style={{ color: hue }}>Aprofundar ({lesson.explanation.length - 1} {lesson.explanation.length - 1 === 1 ? "ponto" : "pontos"})</summary>
+            {lesson.explanation.slice(1).map((p, i) => <p key={i} className="mt-2 text-[15px] leading-relaxed text-muted">{p}</p>)}
+          </details>
+        )}
       </section>
 
-      <section className="card"><p className="label">3 · Exemplo prático</p><p>{lesson.example}</p></section>
-
-      <section className="card"><p className="label">4 · Demonstração passo a passo</p>
-        <ol className="list-decimal ml-5 space-y-1">{lesson.demo.map((d, i) => <li key={i}>{d}</li>)}</ol></section>
-
-      <section className="card"><p className="label">5 · Exercício guiado (recuperação ativa)</p>
-        <p>{lesson.guided.task}</p>
-        <details className="mt-2"><summary className="cursor-pointer text-emerald-300">Ver dicas (tente antes)</summary>
-          <ul className="list-disc ml-5 text-sm text-muted">{lesson.guided.hints.map((h, i) => <li key={i}>{h}</li>)}</ul></details>
+      <section className="rounded border border-line border-l-4 bg-panel p-5 shadow-panel" style={{ borderLeftColor: hue }}>
+        <p className="label">Exemplo prático</p>
+        <p className="text-[15px]">{lesson.example}</p>
       </section>
 
-      <section className="card"><p className="label">6 · Exercício independente</p><p>{lesson.independent}</p></section>
+      <section className="card">
+        <p className="label">Demonstração — marque ao executar ({checkedCount}/{lesson.demo.length})</p>
+        <div className="space-y-1.5">
+          {lesson.demo.map((d, i) => (
+            <label key={i} className={`quiz-opt !my-1.5 ${checks[i] ? "opacity-60" : ""}`}>
+              <input type="checkbox" className="accent-[#61c3b6] w-4 h-4" checked={!!checks[i]}
+                onChange={() => setChecks((c) => { const n = [...c]; n[i] = !n[i]; return n; })} />
+              <span className={checks[i] ? "line-through" : ""}>{d}</span>
+            </label>
+          ))}
+        </div>
+      </section>
 
-      <section className="card"><p className="label">7 · Verificação (resposta só após tentar)</p>
-        {lesson.quiz.map((q, qi) => (
-          <div key={q.id} className="mb-4">
-            <p className="font-semibold">{qi + 1}. {q.prompt}</p>
-            {q.options.map((op, oi) => (
-              <label key={oi} className="quiz-opt text-sm">
-                <input type="radio" name={q.id} className="mr-2 accent-emerald-400"
-                  checked={answers[q.id] === oi} onChange={() => setAnswers((a) => ({ ...a, [q.id]: oi }))} />{op}
-              </label>
-            ))}
-            {revealed && (
-              <div className="text-sm mt-1">
-                <button className="underline text-emerald-300" onClick={() => setShowAnswer((s) => ({ ...s, [q.id]: !s[q.id] }))}>
-                  {showAnswer[q.id] ? "Ocultar explicação" : "Ver por que"}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <section className="card">
+          <p className="label">Exercício guiado</p>
+          <p className="text-sm">{lesson.guided.task}</p>
+          <details className="mt-2"><summary className="cursor-pointer text-sm font-semibold" style={{ color: hue }}>Ver dicas (tente antes)</summary>
+            <ul className="list-disc ml-5 text-sm text-muted mt-1">{lesson.guided.hints.map((h) => <li key={h}>{h}</li>)}</ul></details>
+        </section>
+        <section className="card">
+          <p className="label">Desafio independente</p>
+          <p className="text-sm">{lesson.independent}</p>
+        </section>
+      </div>
+
+      <section className="card" style={{ borderTop: `3px solid ${hue}` }}>
+        <p className="label">Verificação {qi + 1} de {lesson.quiz.length}</p>
+        {!finished ? (
+          <div>
+            <div className="h-1.5 bg-line/60 rounded-sm overflow-hidden mb-3">
+              <div className="h-full transition-all" style={{ width: `${((qi) / lesson.quiz.length) * 100}%`, background: hue }} />
+            </div>
+            <p className="font-bold">{q.prompt}</p>
+            {q.options.map((op, oi) => {
+              const picked = answers[q.id];
+              const locked = picked !== undefined;
+              const isRight = oi === q.answer;
+              return (
+                <button key={oi} disabled={locked} onClick={() => answer(oi)}
+                  className="quiz-opt w-full text-left text-sm"
+                  style={locked && isRight ? { borderColor: hue, background: "#213c3c" } : locked && picked === oi ? { borderColor: "#f19999" } : undefined}>
+                  {op} {locked && isRight && "✓"} {locked && !isRight && picked === oi && "✗"}
                 </button>
-                {showAnswer[q.id] && <p className="text-muted mt-1">Resposta: <strong>{q.options[q.answer]}</strong>. {q.explanation}</p>}
+              );
+            })}
+            {answers[q.id] !== undefined && (
+              <div className="text-sm mt-2">
+                <p className={answers[q.id] === q.answer ? "text-accent font-semibold" : "text-[#f19999] font-semibold"}>
+                  {answers[q.id] === q.answer ? "Certa!" : "Não foi dessa vez."}
+                </p>
+                <button className="underline text-sm mt-1" style={{ color: hue }} onClick={() => setShowWhy((s) => !s)}>
+                  {showWhy ? "Ocultar porquê" : "Por quê?"}
+                </button>
+                {showWhy && <p className="text-muted mt-1">{q.explanation}</p>}
+                <div><button className="btn-primary mt-3" onClick={advance}>{qi + 1 < lesson.quiz.length ? "Próxima →" : "Ver resultado"}</button></div>
               </div>
             )}
           </div>
-        ))}
-        <button className="btn-primary" onClick={grade}>Verificar (exige todas respondidas)</button>
-        {result && <p className="mt-2 text-sm" role="status">{result}</p>}
+        ) : (
+          <div>
+            <p className="text-sm font-semibold" role="status">{result}</p>
+            <p className="text-xs text-muted mt-1">{lesson.completionNote}</p>
+            <div className="flex gap-2 mt-3 flex-wrap">
+              <button className="btn-ghost" onClick={retry}>Refazer quiz</button>
+              {next ? <Link href={`/trilha/${next.id}`} className="btn-primary">Próxima: {next.title}</Link>
+                : <Link href="/" className="btn-ghost">Voltar ao dashboard</Link>}
+            </div>
+          </div>
+        )}
       </section>
 
-      <section className="card"><p className="label">8 · Resumo essencial</p>
-        <ul className="list-disc ml-5">{lesson.summary.map((s, i) => <li key={i}>{s}</li>)}</ul></section>
-
-      <section className="card"><p className="label">9 · Critério de conclusão</p><p className="text-sm">{lesson.completionNote}</p></section>
-
-      <section className="card"><p className="label">10 · Próxima atividade</p>
-        {next ? <Link href={`/trilha/${next.id}`} className="btn-ghost inline-block">Próxima: {next.title}</Link>
-          : <Link href="/" className="btn-ghost inline-block">Voltar ao dashboard</Link>}
+      <section className="card">
+        <p className="label">Resumo essencial</p>
+        <div className="flex flex-wrap gap-2">
+          {lesson.summary.map((s) => (
+            <span key={s} className="text-[13px] rounded-full border border-line bg-black/25 px-3 py-1.5">{s}</span>
+          ))}
+        </div>
       </section>
     </article>
   );

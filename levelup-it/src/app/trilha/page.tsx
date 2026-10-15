@@ -3,6 +3,7 @@ import Link from "next/link";
 import ProgressBar from "@/components/ProgressBar";
 import { MODULES, LESSONS, PLANNED_LESSONS } from "@/lib/seed-tracks";
 import { moduleProgress, useStore } from "@/lib/store";
+import { MODULE_HUE } from "@/components/diagrams";
 
 export default function Trilha() {
   const { store, ready } = useStore();
@@ -17,7 +18,7 @@ export default function Trilha() {
         const lessons = LESSONS.filter((l) => l.moduleId === m.id);
         const planned = PLANNED_LESSONS.filter((x) => x.moduleId === m.id);
         return (
-          <section key={m.id} className="card">
+          <section key={m.id} className="card" style={{ borderTop: `3px solid ${MODULE_HUE[m.id] ?? "#61c3b6"}` }}>
             <div className="flex justify-between items-baseline gap-3">
               <div><h2 className="font-bold">{m.title}</h2>
                 <p className="text-sm text-muted">{m.description}</p>
