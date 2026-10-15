@@ -27,6 +27,7 @@ export interface Lesson {
   terms?: { en: string; pt: string }[];
   commands?: { cmd: string; out: string }[];
   pitfalls?: string[];
+  myth?: { myth: string; truth: string };
 }
 
 export interface CareerModule {

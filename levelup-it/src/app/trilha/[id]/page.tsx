@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import { lessonById, useStore } from "@/lib/store";
 import { LESSONS } from "@/lib/seed-tracks";
 import { MODULE_MEDIA } from "@/lib/seed-media";
+import { LINKS } from "@/lib/seed-deep";
+import { LABS, INCIDENTS } from "@/lib/seed-practice";
 import { LessonVisual, MODULE_HUE } from "@/components/diagrams";
 
 function VideoEmbed({ yt, title, channel, lang }: { yt: string; title: string; channel: string; lang: string }) {
@@ -138,6 +140,19 @@ export default function LessonPage() {
         <p className="text-[15px]">{lesson.example}</p>
       </section>
 
+      {lesson.myth && (
+        <section className="grid sm:grid-cols-2 gap-3">
+          <div className="rounded border border-[#f19999]/50 bg-[#f19999]/5 p-4">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#f19999]">Mito</p>
+            <p className="text-sm mt-1">{lesson.myth.myth}</p>
+          </div>
+          <div className="rounded border border-accent/50 bg-accentsoft/40 p-4">
+            <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-accent">Verdade</p>
+            <p className="text-sm mt-1">{lesson.myth.truth}</p>
+          </div>
+        </section>
+      )}
+
       <section className="card">
         <p className="label">Demonstração — marque ao executar ({checkedCount}/{lesson.demo.length})</p>
         <div className="space-y-1.5">
@@ -198,6 +213,27 @@ export default function LessonPage() {
           <p className="text-sm">{lesson.independent}</p>
         </section>
       </div>
+
+      {(() => {
+        const lk = LINKS[lesson.id];
+        const items = [
+          ...lk.labs.map((id) => ({ href: "/laboratorios", label: `Lab: ${LABS.find((l) => l.id === id)?.title ?? id}` })),
+          ...lk.incidents.map((id) => ({ href: "/incidentes", label: `Incidente: ${INCIDENTS.find((i) => i.id === id)?.title ?? id}` })),
+          ...lk.pages,
+        ];
+        return items.length > 0 ? (
+          <section className="card" style={{ borderTop: `3px solid ${hue}` }}>
+            <p className="label">Pratique agora — a aula continua fora daqui</p>
+            <div className="flex flex-col gap-2">
+              {items.map((it) => (
+                <Link key={it.href + it.label} href={it.href} className="navlink justify-between border border-line">
+                  <span>{it.label}</span><span className="text-xs" style={{ color: hue }}>praticar →</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null;
+      })()}
 
       <section className="card">
         <p className="label">Técnica Feynman — explique com suas palavras</p>

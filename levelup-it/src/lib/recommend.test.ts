@@ -7,6 +7,7 @@ import { SKILLS, readiness } from "@/lib/seed-excellence";
 import { AREAS } from "@/lib/seed-diagnostic";
 import { MODULE_MEDIA } from "@/lib/seed-media";
 import { MODULES } from "@/lib/seed-tracks";
+import { MYTHS, LINKS } from "@/lib/seed-deep";
 import { calcSubnet } from "@/lib/subnet";
 import { lessonById } from "@/lib/store";
 import type { StoreShape } from "@/lib/types";
@@ -37,11 +38,11 @@ describe("recommend()", () => {
 });
 
 describe("conteúdo seed", () => {
-  it("19 aulas prontas, todas com quiz de 3 questões e gabarito", () => {
+  it("19 aulas prontas, todas com quiz de 4 questões e gabarito", () => {
     const ready = LESSONS.filter((l) => l.status === "ready");
     expect(ready.length).toBe(19);
     for (const l of ready) {
-      expect(l.quiz.length).toBe(3);
+      expect(l.quiz.length).toBe(4);
       for (const q of l.quiz) {
         expect(q.answer).toBeGreaterThanOrEqual(0);
         expect(q.answer).toBeLessThan(q.options.length);
@@ -77,6 +78,18 @@ describe("banco de entrevistas", () => {
       expect(full.terms!.length).toBeGreaterThanOrEqual(3);
       expect(full.commands!.length).toBeGreaterThanOrEqual(1);
       expect(full.pitfalls!.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+  it("toda aula tem mito × verdade e pontes de prática válidas", () => {
+    const labIds = new Set(LABS.map((l) => l.id));
+    const incIds = new Set(INCIDENTS.map((i) => i.id));
+    for (const l of LESSONS.filter((x) => x.status === "ready")) {
+      expect(MYTHS[l.id]?.myth.length, l.id).toBeGreaterThan(10);
+      expect(MYTHS[l.id]?.truth.length, l.id).toBeGreaterThan(10);
+      const links = LINKS[l.id];
+      expect(links, l.id).toBeDefined();
+      for (const id of links.labs) expect(labIds.has(id)).toBe(true);
+      for (const id of links.incidents) expect(incIds.has(id)).toBe(true);
     }
   });
 });
@@ -173,8 +186,8 @@ describe("metas 30/60/90", () => {
   });
 });
 describe("regras de conclusão", () => {
-  it("quiz exige 80%: 2/3 = 67% reprova", () => {
-    expect(Math.round((2 / 3) * 100) >= 80).toBe(false);
+  it("quiz exige 80%: 3/4 = 75% reprova", () => {
+    expect(Math.round((3 / 4) * 100) >= 80).toBe(false);
   });
   it("intervalos de revisão seguem 1,3,7,14,30", async () => {
     const { REVIEW_STEPS } = await import("@/lib/store");
