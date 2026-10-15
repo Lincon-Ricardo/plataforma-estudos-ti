@@ -7,6 +7,7 @@ import { SKILLS, readiness } from "@/lib/seed-excellence";
 import { AREAS } from "@/lib/seed-diagnostic";
 import { MODULE_MEDIA } from "@/lib/seed-media";
 import { MODULES } from "@/lib/seed-tracks";
+import { calcSubnet } from "@/lib/subnet";
 import { lessonById } from "@/lib/store";
 import type { StoreShape } from "@/lib/types";
 
@@ -138,6 +139,31 @@ describe("base curricular e mídia", () => {
   });
 });
 
+describe("calculadora de sub-redes", () => {
+  it("192.168.10.70/26 → rede .64, broadcast .127, 62 hosts", () => {
+    const r = calcSubnet("192.168.10.70", 26);
+    if ("error" in r) throw new Error(r.error);
+    expect(r.network).toBe("192.168.10.64");
+    expect(r.broadcast).toBe("192.168.10.127");
+    expect(r.mask).toBe("255.255.255.192");
+    expect(r.firstHost).toBe("192.168.10.65");
+    expect(r.lastHost).toBe("192.168.10.126");
+    expect(r.usableHosts).toBe(62);
+    expect(r.steps.length).toBeGreaterThanOrEqual(4);
+  });
+  it("10.20.30.150/27 → broadcast .159", () => {
+    const r = calcSubnet("10.20.30.150", 27);
+    if ("error" in r) throw new Error(r.error);
+    expect(r.network).toBe("10.20.30.128");
+    expect(r.broadcast).toBe("10.20.30.159");
+    expect(r.usableHosts).toBe(30);
+  });
+  it("rejeita IP e prefixo inválidos", () => {
+    expect("error" in calcSubnet("999.1.1.1", 24)).toBe(true);
+    expect("error" in calcSubnet("10.0.0.1", 33)).toBe(true);
+    expect("error" in calcSubnet("abc", 24)).toBe(true);
+  });
+});
 describe("metas 30/60/90", () => {
   it("gera 3 itens por horizonte", () => {
     const g = goals30_60_90(base());

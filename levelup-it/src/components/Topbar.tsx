@@ -7,6 +7,8 @@ const TITLES: [RegExp, string][] = [
   [/^\/diagnostico/, "Diagnóstico inicial"],
   [/^\/revisao/, "Revisão espaçada"],
   [/^\/incidentes/, "Simulador de incidentes"],
+  [/^\/terminal/, "Terminal didático"],
+  [/^\/ferramentas/, "Ferramentas interativas"],
   [/^\/laboratorios/, "Laboratórios práticos"],
   [/^\/projetos/, "Projetos de portfólio"],
   [/^\/plano/, "Plano semanal"],
