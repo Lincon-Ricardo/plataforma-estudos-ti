@@ -28,6 +28,8 @@ export interface Lesson {
   commands?: { cmd: string; out: string }[];
   pitfalls?: string[];
   myth?: { myth: string; truth: string };
+  level?: "base" | "intermediário";
+  minutes?: number;
 }
 
 export interface CareerModule {

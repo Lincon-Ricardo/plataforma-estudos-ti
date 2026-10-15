@@ -4,6 +4,7 @@ import type { Attempt, Lesson, ReviewItem, StoreShape, UserProfile } from "./typ
 import { LESSONS } from "./seed-tracks";
 import { ENRICH } from "./seed-enrich";
 import { MYTHS } from "./seed-deep";
+import { LESSON_META } from "./seed-meta";
 
 const KEY = "levelup-it-v1";
 export const REVIEW_STEPS = [1, 3, 7, 14, 30];
@@ -120,7 +121,7 @@ export function useStore(): Ctx {
 export function lessonById(id: string): Lesson | undefined {
   const l = LESSONS.find((x) => x.id === id);
   if (!l) return undefined;
-  return { ...l, ...(ENRICH[id] ?? {}), myth: MYTHS[id] };
+  return { ...l, ...(ENRICH[id] ?? {}), myth: MYTHS[id], ...(LESSON_META[id] ?? {}) };
 }
 
 export function moduleProgress(moduleId: string, completed: Record<string, string>): { total: number; done: number; pct: number } {

@@ -100,6 +100,7 @@ const VISUALS: Record<string, JSX.Element> = {
   "m7-ec2": <Bars hue="#f2b56b" items={[{ label: "EC2 ligada", pct: 55, note: "hora acumulada" }, { label: "EBS + snapshots", pct: 25 }, { label: "Transferência + IP", pct: 20 }]} />,
   "m7-rds-s3": <FlowSteps hue="#f2b56b" steps={["Standard 30d", "→ IA 60d", "→ expirar", "RDS: snapshot + restore testado"]} />,
   "m8-sql": <Chain hue="#7cd6d6" nodes={["FROM + WHERE", "JOIN pela chave", "GROUP BY + COUNT"]} />,
+  "m8-git": <Chain hue="#7cd6d6" nodes={["init/add/commit", "log/diff", "push/pull"]} />,
   "m9-n2": <FlowSteps hue="#d3e07c" steps={["Situação + impacto", "Hipóteses e testes", "Ação com evidência", "Resultado + aprendizado"]} />,
 };
 

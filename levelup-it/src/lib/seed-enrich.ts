@@ -246,6 +246,20 @@ export const ENRICH: Record<string, Enrich> = {
     ],
     pitfalls: ["UPDATE/DELETE sem WHERE.", "SELECT * em tabela gigante travando o banco.", "JOIN sem condição (produto cartesiano)."],
   },
+  "m8-git": {
+    terms: [
+      { en: "commit", pt: "registro com mensagem no histórico" },
+      { en: "staging area", pt: "palco do próximo commit (git add)" },
+      { en: "remote", pt: "repositório remoto (origin)" },
+      { en: "clone", pt: "copiar um repo com histórico" },
+    ],
+    commands: [
+      { cmd: "git status", out: "Modificados, staged e não rastreados." },
+      { cmd: "git log --oneline -10", out: "Histórico curto dos últimos commits." },
+      { cmd: "git diff", out: "O que mudou e ainda não foi staged." },
+    ],
+    pitfalls: ["Senha/token commitado (rotacione, histórico não esquece).", "Commit gigante 'update' sem mensagem útil.", "push --force em branch compartilhada."],
+  },
   "m9-n2": {
     terms: [
       { en: "STAR", pt: "Situação, Tarefa, Ação, Resultado" },

@@ -225,6 +225,27 @@ export const LESSONS: Lesson[] = [
     completionNote: "Quiz ≥80% para concluir.",
   },
   {
+    id: "m8-git", moduleId: "m8-sql-git", status: "ready",
+    title: "Git essencial: versione tudo, vaze nada",
+    objective: "Usar init/add/commit/push/pull, ler log/diff e manter segredos fora do repositório.",
+    explanation: [
+      "Git registra histórico, não arquivos soltos: working tree → staging (add) → commit (mensagem do porquê) → push (remoto). log mostra a linha do tempo; diff mostra o que mudou antes de commitar.",
+      "Segredo (senha, token, chave) commitado vaza para sempre — histórico não esquece. Use .gitignore + variável de ambiente; se vazar, rotacione o segredo imediatamente.",
+    ],
+    example: "Script de inventário: git init → 3 commits pequenos ('coleta serviços', 'adiciona CSV', 'adiciona README') → push. Revisão futura entende cada passo.",
+    demo: ["git init + primeiro commit com README.", "Altere 1 arquivo: git diff, add, commit com mensagem do porquê.", "Crie .gitignore (ex.: *.csv com dados) e prove com git status."],
+    guided: { task: "Ordene: push, add, commit, init. O que cada um faz com seus arquivos?", hints: ["init cria; add prepara; commit registra; push publica."] },
+    independent: "Versione um script real com 3 commits e suba para um repo (pode ser privado).",
+    quiz: [
+      { id: "m8g-q1", prompt: "O que é a staging area?", options: ["Lixeira do Git", "Palco: o que entra no próximo commit via add", "O servidor remoto"], answer: 1, explanation: "add prepara; commit registra o preparado. git status mostra os dois estados." },
+      { id: "m8g-q2", prompt: "Para que serve o .gitignore?", options: ["Acelerar a internet", "Dizer o que nunca entra no repo (logs, CSVs com dados, .env)", "Apagar arquivos"], answer: 1, explanation: "Ignorado não é versionado. Segredo e dado sensível moram lá." },
+      { id: "m8g-q3", prompt: "Você commitou uma senha. Primeira ação correta?", options: ["Apagar o arquivo no próximo commit", "Rotacionar o segredo imediatamente (histórico não esquece)", "Renomear o repo"], answer: 1, explanation: "Remover do HEAD não apaga do histórico/remoto. O segredo está comprometido: troque." },
+      { id: "m8g-q4", prompt: "git pull faz o quê?", options: ["Apaga o remoto", "Busca (fetch) + integra (merge) as novidades do remoto", "Só mostra o log"], answer: 1, explanation: "pull = fetch + merge. Em dúvida, fetch + log antes de integrar." },
+    ],
+    summary: ["add → commit → push, mensagens com porquê.", "diff antes, log depois.", "Segredo fora do repo, sempre."],
+    completionNote: "Quiz ≥80% para concluir.",
+  },
+  {
     id: "m9-n2", moduleId: "m9-carreira", status: "ready",
     title: "Virar N2: portfólio, currículo e entrevista",
     objective: "Traduzir estudo em prova: documentar, apresentar e responder como N2.",

@@ -3,7 +3,7 @@ import Link from "next/link";
 import ProgressBar from "@/components/ProgressBar";
 import { MODULES, LESSONS, PLANNED_LESSONS } from "@/lib/seed-tracks";
 import { MODULE_MEDIA } from "@/lib/seed-media";
-import { moduleProgress, useStore } from "@/lib/store";
+import { lessonById, moduleProgress, useStore } from "@/lib/store";
 import { MODULE_HUE } from "@/components/diagrams";
 
 const STAGES = [
@@ -57,6 +57,7 @@ export default function Trilha() {
             <div className="flex justify-between items-baseline gap-3">
               <div><h2 className="font-bold">{m.title}</h2>
                 <p className="text-sm text-muted">{m.description}</p>
+                <p className="text-xs mt-1 font-mono text-muted">{p.done}/{p.total} aulas · ~{LESSONS.filter((l) => l.moduleId === m.id && l.status === "ready").reduce((a, l) => a + (lessonById(l.id)?.minutes ?? 30), 0)} min totais</p>
                 <p className="text-xs mt-1" style={{ color: MODULE_HUE[m.id] ?? "#61c3b6" }}>Base: {MODULE_MEDIA[m.id]?.framework}</p>
                 {!!m.prereqs.length && <p className="text-xs text-muted">Pré-requisitos: {m.prereqs.join(", ")}</p>}</div>
               <span className="text-sm whitespace-nowrap">{p.pct}%</span>

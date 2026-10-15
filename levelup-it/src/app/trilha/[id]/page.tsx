@@ -35,6 +35,18 @@ export default function LessonPage() {
   const [finished, setFinished] = useState(false);
   const [result, setResult] = useState("");
   const [showWhy, setShowWhy] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setProgress(max > 0 ? Math.round((h.scrollTop / max) * 100) : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const done = !!store.completedLessons[id];
   const hue = lesson ? MODULE_HUE[lesson.moduleId] ?? "#61c3b6" : "#61c3b6";
@@ -84,8 +96,11 @@ export default function LessonPage() {
 
   return (
     <article className="space-y-4 max-w-3xl">
+      <div className="sticky top-16 z-10 h-1 bg-line/40 -mx-1" aria-hidden>
+        <div className="h-full transition-all" style={{ width: `${progress}%`, background: hue }} />
+      </div>
       <div className="rounded border border-line bg-panel p-6" style={{ borderTop: `4px solid ${hue}` }}>
-        <p className="label">{done ? "Aula concluída ✓" : "Aula"} · {lesson.quiz.length} verificações · {lesson.demo.length} passos práticos</p>
+        <p className="label">{done ? "Aula concluída ✓" : "Aula"} · {lesson.level} · ~{lesson.minutes} min · {lesson.quiz.length} verificações · {lesson.demo.length} passos</p>
         <h1 className="text-2xl font-extrabold">{lesson.title}</h1>
         <p className="text-sm text-muted mt-2"><strong className="text-bodytext">Objetivo:</strong> {lesson.objective}</p>
       </div>

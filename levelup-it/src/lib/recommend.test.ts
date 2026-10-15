@@ -8,6 +8,8 @@ import { AREAS } from "@/lib/seed-diagnostic";
 import { MODULE_MEDIA } from "@/lib/seed-media";
 import { MODULES } from "@/lib/seed-tracks";
 import { MYTHS, LINKS } from "@/lib/seed-deep";
+import { LESSON_META } from "@/lib/seed-meta";
+import { buildWeek } from "@/lib/plan";
 import { calcSubnet } from "@/lib/subnet";
 import { lessonById } from "@/lib/store";
 import type { StoreShape } from "@/lib/types";
@@ -38,9 +40,9 @@ describe("recommend()", () => {
 });
 
 describe("conteúdo seed", () => {
-  it("19 aulas prontas, todas com quiz de 4 questões e gabarito", () => {
+  it("20 aulas prontas, todas com quiz de 4 questões e gabarito", () => {
     const ready = LESSONS.filter((l) => l.status === "ready");
-    expect(ready.length).toBe(19);
+    expect(ready.length).toBe(20);
     for (const l of ready) {
       expect(l.quiz.length).toBe(4);
       for (const q of l.quiz) {
@@ -95,8 +97,8 @@ describe("banco de entrevistas", () => {
 });
 
 describe("matriz excelência", () => {
-  it("22 skills com evidências que existem de verdade", () => {
-    expect(SKILLS.length).toBe(22);
+  it("23 skills com evidências que existem de verdade", () => {
+    expect(SKILLS.length).toBe(23);
     const lessonIds = new Set(LESSONS.map((l) => l.id));
     const labIds = new Set(LABS.map((l) => l.id));
     const incIds = new Set(INCIDENTS.map((i) => i.id));
@@ -175,6 +177,30 @@ describe("calculadora de sub-redes", () => {
     expect("error" in calcSubnet("999.1.1.1", 24)).toBe(true);
     expect("error" in calcSubnet("10.0.0.1", 33)).toBe(true);
     expect("error" in calcSubnet("abc", 24)).toBe(true);
+  });
+});
+describe("plano semanal", () => {
+  it("toda aula pronta tem nível e duração", () => {
+    for (const l of LESSONS.filter((x) => x.status === "ready")) {
+      const m = LESSON_META[l.id];
+      expect(m, l.id).toBeDefined();
+      expect(["base", "intermediário"]).toContain(m.level);
+      expect(m.minutes).toBeGreaterThanOrEqual(15);
+    }
+  });
+  it("encaixa aulas nos minutos sem estourar o dia, em ordem", () => {
+    const pending = [{ id: "a", minutes: 25 }, { id: "b", minutes: 20 }, { id: "c", minutes: 20 }];
+    const { week, queue } = buildWeek(["seg", "ter"], 45, pending);
+    expect(queue.length).toBe(0);
+    for (const d of week) expect(d.total).toBeLessThanOrEqual(45);
+    expect(week.flatMap((d) => d.items.map((i) => i.lessonId))).toEqual(["a", "b", "c"]);
+    expect(week[0].items.map((i) => i.lessonId)).toEqual(["a", "b"]);
+  });
+  it("o que não coube vai para a fila, em ordem", () => {
+    const pending = [{ id: "a", minutes: 40 }, { id: "b", minutes: 40 }];
+    const { week, queue } = buildWeek(["seg"], 45, pending);
+    expect(week[0].items.map((i) => i.lessonId)).toEqual(["a"]);
+    expect(queue.map((q) => q.id)).toEqual(["b"]);
   });
 });
 describe("metas 30/60/90", () => {

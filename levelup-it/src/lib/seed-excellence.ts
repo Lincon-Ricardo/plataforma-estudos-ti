@@ -33,6 +33,7 @@ export const SKILLS: Skill[] = [
   { id: "s-backup", level: "Infra", name: "Backup com restore testado", evidence: [L("m5-backup", "Aula backup")] },
   { id: "s-script", level: "Infra", name: "Script de inventário + projeto", evidence: [L("m4-inventario", "Aula script"), P("p2-inventario", "Projeto inventário")] },
   { id: "s-sql", level: "Infra", name: "SQL para suporte", evidence: [L("m8-sql", "Aula SQL"), D("SQL e bancos de dados")] },
+  { id: "s-git", level: "Infra", name: "Git sem vazar segredo", evidence: [L("m8-git", "Aula Git"), D("Git, programação e automação")] },
   { id: "s-identidade", level: "Infra", name: "Identidade e MFA na prática", evidence: [L("m3-intune", "Aula Intune"), INC("inc-auth-mfa", "Incidente MFA")] },
   { id: "s-awsbase", level: "Cloud", name: "Cloud base sem gastar", evidence: [L("m7-zero", "Aula AWS zero"), LAB("lab-aws-orcamento", "Lab orçamento")] },
   { id: "s-ec2", level: "Cloud", name: "EC2 + VPC planejados", evidence: [L("m7-ec2", "Aula EC2/VPC")] },

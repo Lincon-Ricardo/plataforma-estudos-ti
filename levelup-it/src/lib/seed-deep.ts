@@ -21,6 +21,7 @@ export const MYTHS: Record<string, Myth> = {
   "m7-ec2": { myth: "Desligar a VM zera a conta.", truth: "Stop zera CPU; EBS, snapshots e IP elástico continuam cobrando." },
   "m7-rds-s3": { myth: "Na nuvem o backup é automático.", truth: "O automático retém dias; snapshot, lifecycle e teste de restore são seu trabalho." },
   "m8-sql": { myth: "SELECT * é inofensivo.", truth: "Em tabela grande trava banco e rede. Selecione colunas e filtre no banco." },
+  "m8-git": { myth: "Git é um backup na nuvem.", truth: "É histórico versionado: sem remoto, disciplina e .gitignore, não protege nada." },
   "m9-n2": { myth: "Certificado garante a vaga.", truth: "O que decide é artefato reproduzível + raciocínio em voz alta na entrevista." },
 };
 
@@ -43,5 +44,6 @@ export const LINKS: Record<string, LessonLinks> = {
   "m7-ec2": { labs: [], incidents: ["inc-aws-custo"], pages: [] },
   "m7-rds-s3": { labs: [], incidents: ["inc-aws-custo"], pages: [] },
   "m8-sql": { labs: [], incidents: [], pages: [] },
+  "m8-git": { labs: [], incidents: [], pages: [] },
   "m9-n2": { labs: [], incidents: [], pages: [{ href: "/entrevista", label: "Simulação de entrevista" }] },
 };
