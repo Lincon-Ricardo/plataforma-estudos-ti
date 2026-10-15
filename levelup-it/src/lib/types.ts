@@ -24,6 +24,9 @@ export interface Lesson {
   summary: string[];
   completionNote: string;
   status: LessonStatus;
+  terms?: { en: string; pt: string }[];
+  commands?: { cmd: string; out: string }[];
+  pitfalls?: string[];
 }
 
 export interface CareerModule {

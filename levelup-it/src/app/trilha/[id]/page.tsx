@@ -93,6 +93,41 @@ export default function LessonPage() {
         </div>
       </section>
 
+      {!!lesson.commands?.length && (
+        <section className="card">
+          <p className="label">Referência de comandos (leia a saída esperada)</p>
+          <div className="space-y-2">
+            {lesson.commands.map((c) => (
+              <div key={c.cmd}>
+                <code className="block bg-black/40 rounded px-2 py-1.5 text-[13px] break-all" style={{ color: hue }}>{c.cmd}</code>
+                <p className="text-[13px] text-muted mt-0.5">→ {c.out}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        {!!lesson.terms?.length && (
+          <section className="card">
+            <p className="label">Inglês técnico (EN → PT)</p>
+            <dl className="text-sm space-y-1.5">
+              {lesson.terms.map((t) => (
+                <div key={t.en}><dt className="font-mono text-[13px] font-bold" style={{ color: hue }}>{t.en}</dt><dd className="text-muted text-[13px]">{t.pt}</dd></div>
+              ))}
+            </dl>
+          </section>
+        )}
+        {!!lesson.pitfalls?.length && (
+          <section className="card" style={{ borderTop: "3px solid #f19999" }}>
+            <p className="label !text-[#f19999]">Armadilhas comuns</p>
+            <ul className="text-sm space-y-1.5">
+              {lesson.pitfalls.map((p) => <li key={p} className="flex gap-2"><span>✗</span>{p}</li>)}
+            </ul>
+          </section>
+        )}
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-4">
         <section className="card">
           <p className="label">Exercício guiado</p>

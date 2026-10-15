@@ -3,6 +3,7 @@ import { recommend, goals30_60_90 } from "@/lib/recommend";
 import { LESSONS } from "@/lib/seed-tracks";
 import { INCIDENTS, LABS } from "@/lib/seed-practice";
 import { INTERVIEW } from "@/lib/seed-interview";
+import { lessonById } from "@/lib/store";
 import type { StoreShape } from "@/lib/types";
 
 function base(): StoreShape {
@@ -62,6 +63,15 @@ describe("banco de entrevistas", () => {
     for (const q of INTERVIEW) {
       expect(q.expected.length).toBeGreaterThanOrEqual(3);
       expect(q.tip.length).toBeGreaterThan(5);
+    }
+  });
+  it("toda aula pronta tem vocabulário, comandos e armadilhas", () => {
+    const ready = LESSONS.filter((l) => l.status === "ready");
+    for (const l of ready) {
+      const full = lessonById(l.id)!;
+      expect(full.terms!.length).toBeGreaterThanOrEqual(3);
+      expect(full.commands!.length).toBeGreaterThanOrEqual(1);
+      expect(full.pitfalls!.length).toBeGreaterThanOrEqual(2);
     }
   });
 });
