@@ -54,7 +54,7 @@ export default function Dashboard() {
 
       <section className="continue-strip">
         <div>
-          <p className="label">Atividade recomendada — baseada no seu progresso real</p>
+          <p className="label">Sua missão de hoje</p>
           {recLesson ? (
             <>
               <h2 className="text-xl font-extrabold">{recLesson.title}</h2>

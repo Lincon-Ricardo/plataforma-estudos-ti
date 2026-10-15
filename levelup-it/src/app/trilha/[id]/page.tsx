@@ -1,10 +1,24 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { lessonById, useStore } from "@/lib/store";
 import { LESSONS } from "@/lib/seed-tracks";
+import { MODULE_MEDIA } from "@/lib/seed-media";
 import { LessonVisual, MODULE_HUE } from "@/components/diagrams";
+
+function VideoEmbed({ yt, title, channel }: { yt: string; title: string; channel: string }) {
+  return (
+    <div>
+      <div className="aspect-video w-full overflow-hidden rounded border border-line bg-black">
+        <iframe className="w-full h-full" src={`https://www.youtube-nocookie.com/embed/${yt}`}
+          title={title} loading="lazy" allowFullScreen
+          allow="accelerometer; encrypted-media; picture-in-picture" />
+      </div>
+      <p className="text-xs text-muted mt-1">{title} · {channel} · apoio externo (YouTube)</p>
+    </div>
+  );
+}
 
 export default function LessonPage() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +34,16 @@ export default function LessonPage() {
 
   const done = !!store.completedLessons[id];
   const hue = lesson ? MODULE_HUE[lesson.moduleId] ?? "#61c3b6" : "#61c3b6";
+  const media = lesson ? MODULE_MEDIA[lesson.moduleId] : undefined;
+
+  const [feynman, setFeynman] = useState("");
+  useEffect(() => {
+    try { setFeynman(localStorage.getItem(`levelup-it-feynman-${id}`) ?? ""); } catch {}
+  }, [id]);
+  const saveFeynman = (v: string) => {
+    setFeynman(v);
+    try { localStorage.setItem(`levelup-it-feynman-${id}`, v); } catch {}
+  };
 
   const next = useMemo(() => {
     if (!lesson) return null;
@@ -63,6 +87,24 @@ export default function LessonPage() {
       </div>
 
       <LessonVisual id={lesson.id} moduleId={lesson.moduleId} />
+
+      {!!(media && (media.videos.length || media.framework)) && (
+        <section className="card" style={{ borderTop: `3px solid ${hue}` }}>
+          <p className="label">Aprenda de outro jeito — ver antes de ler</p>
+          <p className="text-[13px] text-muted mb-3">Base curricular: <strong className="text-bodytext">{media.framework}</strong></p>
+          {media.videos.length > 0 && (
+            <div className="grid gap-4">
+              {media.videos.map((v) => <VideoEmbed key={v.yt} {...v} />)}
+            </div>
+          )}
+          <p className="text-[13px] mt-3">Documentação oficial:</p>
+          <ul className="text-sm mt-1 space-y-1">
+            {media.docs.map((d) => (
+              <li key={d.url + d.label}><a href={d.url} target="_blank" rel="noreferrer" className="underline" style={{ color: hue }}>{d.label} ↗</a></li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <section className="card">
         <p className="label">O essencial</p>
@@ -140,6 +182,14 @@ export default function LessonPage() {
           <p className="text-sm">{lesson.independent}</p>
         </section>
       </div>
+
+      <section className="card">
+        <p className="label">Técnica Feynman — explique com suas palavras</p>
+        <p className="text-[13px] text-muted mb-2">Se você não consegue explicar simples, ainda não dominou. Escreva abaixo (salvo neste navegador, privado).</p>
+        <textarea className="input h-20" value={feynman} onChange={(e) => saveFeynman(e.target.value)}
+          placeholder="Ex.: gateway é... porque..." />
+        <p className="text-xs text-muted mt-1">{feynman.trim().length >= 50 ? "✓ Explicação registrada. Releia em voz alta." : "Mínimo sugerido: 50 caracteres."}</p>
+      </section>
 
       <section className="card" style={{ borderTop: `3px solid ${hue}` }}>
         <p className="label">Verificação {qi + 1} de {lesson.quiz.length}</p>

@@ -8,6 +8,18 @@
 body { @apply bg-ink text-bodytext font-sans antialiased; }
 
 h1, h2, h3, strong { @apply font-display; }
+h1 { @apply tracking-tight; }
+
+a { @apply underline-offset-2; }
+
+code { @apply font-mono text-[0.92em]; }
+
+details summary { @apply rounded; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #101a20; }
+::-webkit-scrollbar-thumb { background: #30434b; border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: #61c3b6; }
 
 button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible, summary:focus-visible {
   outline: 3px solid #e7ac58; outline-offset: 2px;
@@ -20,8 +32,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visib
 .label { @apply block font-mono text-[11px] font-bold uppercase tracking-[0.12em] text-accent mb-1; }
 
 /* Botões */
-.btn-primary { @apply inline-block bg-accent hover:bg-accentdeep text-[#0b1518] font-display font-bold text-sm rounded px-5 py-2.5 transition disabled:opacity-40 disabled:cursor-not-allowed; }
-.btn-ghost { @apply inline-block border border-line hover:border-accent hover:text-white text-bodytext font-display font-semibold text-sm rounded px-4 py-2.5 transition bg-transparent; }
+.btn-primary { @apply inline-block bg-accent hover:bg-accentdeep text-[#0b1518] font-display font-extrabold text-[15px] rounded-md px-6 py-3 transition disabled:opacity-40 disabled:cursor-not-allowed shadow-panel; }
+.btn-ghost { @apply inline-block border border-line hover:border-accent hover:text-white text-bodytext font-display font-semibold text-sm rounded-md px-4 py-2.5 transition bg-transparent; }
 
 /* Campos */
 .input { @apply w-full bg-black/30 border border-line rounded px-3 py-2 text-sm outline-none focus:border-accent placeholder:text-muted/60 text-bodytext; }

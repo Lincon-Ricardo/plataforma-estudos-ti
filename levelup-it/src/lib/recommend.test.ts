@@ -5,6 +5,8 @@ import { INCIDENTS, LABS, PROJECTS } from "@/lib/seed-practice";
 import { INTERVIEW } from "@/lib/seed-interview";
 import { SKILLS, readiness } from "@/lib/seed-excellence";
 import { AREAS } from "@/lib/seed-diagnostic";
+import { MODULE_MEDIA } from "@/lib/seed-media";
+import { MODULES } from "@/lib/seed-tracks";
 import { lessonById } from "@/lib/store";
 import type { StoreShape } from "@/lib/types";
 
@@ -106,6 +108,24 @@ describe("matriz excelência", () => {
     expect(r.total).toBe(12);
     expect(r.done).toBe(0);
     expect(r.missing.length).toBe(12);
+  });
+});
+
+describe("base curricular e mídia", () => {
+  it("9 módulos com framework; vídeos com ID válido; docs https", () => {
+    for (const m of MODULES) {
+      const media = MODULE_MEDIA[m.id];
+      expect(media, m.id).toBeDefined();
+      expect(media.framework.length).toBeGreaterThan(10);
+      for (const v of media.videos) {
+        expect(v.yt).toMatch(/^[A-Za-z0-9_-]{11}$/);
+        expect(v.title.length).toBeGreaterThan(5);
+      }
+      for (const d of media.docs) {
+        expect(d.url.startsWith("https://")).toBe(true);
+        expect(d.label.length).toBeGreaterThan(5);
+      }
+    }
   });
 });
 
