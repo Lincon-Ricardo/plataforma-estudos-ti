@@ -22,8 +22,8 @@ export default function Tutor() {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: q }),
       });
-      const data = await r.json();
-      if (r.status === 501) setErr(data.message + " Custos (pay-as-you-go) em .env.example.");
+      const data = await r.json().catch(() => ({}));
+      if (r.status === 501 || r.status === 404) setErr((data.message as string) || "IA indisponível neste ambiente (deploy estático sem servidor). Use o modo offline — ele cobre o essencial. Custos da IA em .env.example.");
       else if (!r.ok) setErr(data.error || "Erro desconhecido.");
       else setAi(data.answer);
     } catch {

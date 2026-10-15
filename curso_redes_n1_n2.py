@@ -1,9 +1,11 @@
+from pathlib import Path
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Table, TableStyle, Preformatted
 
-OUTPUT_PATH = r"c:\Users\Lincon.silva\Desktop\curso\Curso_Completo_de_Redes_Suporte_N1_N2.pdf"
+OUTPUT_PATH = Path(__file__).resolve().with_name('Curso_Completo_de_Redes_Suporte_N1_N2.pdf')
 
 styles = getSampleStyleSheet()
 

@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
+  basePath: process.env.NEXT_BASE_PATH || "",
+  images: { unoptimized: true },
   async headers() {
+    // Válido no servidor (dev/Vercel). No export estático é ignorado.
+    if (process.env.NEXT_BASE_PATH) return [];
     return [
       {
         source: "/:path*",

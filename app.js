@@ -98,6 +98,58 @@ const checkpointAnswers = {
 
 modules.forEach((module) => { module.checkAnswer = checkpointAnswers[module.id]; });
 
+const quizBank = {
+  fundamentos: [
+    { prompt: 'Um computador 192.168.10.25/24 acessa 192.168.10.80. Qual próximo salto ele usa?', options: ['Gateway padrão, pois todo tráfego passa pelo roteador', 'Entrega local na sub-rede, após resolver o MAC do destino', 'Servidor DNS, que encaminha os pacotes', 'Broadcast para a Internet'], answer: 1, explanation: 'Os dois endereços pertencem a 192.168.10.0/24. O host tenta entregar diretamente no enlace local; o gateway é usado para destinos fora da sub-rede.' },
+    { prompt: 'Para enviar um pacote a um servidor em outra sub-rede, qual MAC fica no primeiro quadro Ethernet?', options: ['O MAC do servidor remoto', 'O MAC do servidor DNS', 'O MAC do próximo salto, normalmente o gateway', 'Um MAC público do provedor'], answer: 2, explanation: 'O quadro alcança o próximo salto local. O endereço IP de destino continua sendo o do servidor remoto, mas o MAC do quadro é do gateway.' },
+    { prompt: 'O ícone do Wi-Fi mostra conectado. O que isso comprova?', options: ['Que o DHCP, DNS e Internet funcionam', 'Somente a associação ao ponto de acesso; as demais etapas precisam de teste', 'Que a aplicação corporativa está disponível', 'Que o gateway está respondendo'], answer: 1, explanation: 'Associação sem fio não comprova concessão DHCP, rota, DNS ou disponibilidade do serviço.' },
+    { prompt: 'Qual comando Windows ajuda a coletar IP, máscara, gateway, DNS e DHCP da interface?', options: ['ipconfig /all', 'tasklist /svc', 'net user', 'Get-Process'], answer: 0, explanation: 'ipconfig /all exibe configuração detalhada das interfaces, incluindo endereço, gateway, DNS e dados de DHCP.' },
+    { prompt: 'Um host tem endereço 169.254.20.12 e não mostra gateway. Qual conclusão é segura?', options: ['O DNS está definitivamente fora do ar', 'A rede está correta e a aplicação caiu', 'Ele não obteve configuração IPv4 utilizável por DHCP; a causa ainda precisa ser investigada', 'O endereço foi necessariamente configurado manualmente'], answer: 2, explanation: '169.254/16 é um endereço link-local usado pelo autoconfiguration. É uma pista de que a concessão DHCP não foi obtida, não a causa-raiz.' }
+  ],
+  osi: [
+    { prompt: 'Um ping ao servidor responde. O que foi testado diretamente?', options: ['A aplicação HTTPS completa', 'Uma resposta ICMP do destino', 'A validade do certificado TLS', 'A autenticação do usuário'], answer: 1, explanation: 'Ping usa ICMP. Uma resposta não valida TCP/443, TLS, HTTP ou autenticação.' },
+    { prompt: 'Test-NetConnection servidor -Port 443 retorna TcpTestSucceeded: True. O que isso permite concluir?', options: ['A conexão TCP à porta 443 foi estabelecida naquele teste', 'O certificado é confiável e não expirou', 'A página carregou corretamente', 'O usuário tem autorização no sistema'], answer: 0, explanation: 'O teste verifica conectividade TCP para o destino/porta. TLS, resposta HTTP e autorização exigem verificações separadas.' },
+    { prompt: 'O nome do sistema não resolve, mas o usuário ainda não testou o IP. Qual próximo passo é mais direcionado?', options: ['Trocar o cabo sem verificar interface', 'Investigar a resolução do nome e registrar servidor e resposta DNS', 'Liberar todas as portas no firewall', 'Reinstalar o navegador'], answer: 1, explanation: 'O sintoma aponta primeiro para resolução de nomes. Preserve a resposta e compare-a com uma referência autorizada antes de alterar configurações.' },
+    { prompt: 'Por que o modelo em camadas ajuda no troubleshooting?', options: ['Porque um teste bem-sucedido em uma camada garante todas as superiores', 'Porque organiza evidências e limita hipóteses sem provar automaticamente as camadas superiores', 'Porque determina que todo incidente deve começar pela camada 7', 'Porque substitui logs e testes práticos'], answer: 1, explanation: 'Modelos ajudam a organizar responsabilidades e hipóteses. Cada teste comprova apenas o que efetivamente mediu.' },
+    { prompt: 'DNS e TCP/443 funcionam, mas o navegador apresenta erro de certificado. Onde concentrar a próxima investigação?', options: ['Camada física, sem outra evidência', 'TLS: nome do certificado, validade, cadeia de confiança e relógio', 'DHCP, necessariamente', 'A tabela ARP do servidor remoto'], answer: 1, explanation: 'A resolução e o estabelecimento TCP foram observados. O erro de certificado direciona a investigação para TLS e confiança do certificado.' }
+  ],
+  ipv4: [
+    { prompt: 'Qual é a rede que contém 192.168.10.70/26?', options: ['192.168.10.0/26', '192.168.10.32/26', '192.168.10.64/26', '192.168.10.128/26'], answer: 2, explanation: 'Um /26 divide o último octeto em blocos de 64. O endereço .70 está no intervalo .64–.127.' },
+    { prompt: '192.168.1.70/26 e 192.168.1.130/26 estão na mesma sub-rede?', options: ['Sim, pois os três primeiros octetos são iguais', 'Não: pertencem, respectivamente, a 192.168.1.64/26 e 192.168.1.128/26', 'Sim, porque todo 192.168.x.x é uma única rede', 'Não é possível saber mesmo conhecendo os prefixos'], answer: 1, explanation: 'Cada /26 tem 64 endereços. .70 está no bloco .64–.127 e .130 no bloco .128–.191.' },
+    { prompt: 'Qual intervalo pertence ao espaço privado 172.16/12?', options: ['172.0.0.0 a 172.15.255.255', '172.16.0.0 a 172.31.255.255', '172.32.0.0 a 172.255.255.255', '172.16.0.0 a 172.16.255.255 apenas'], answer: 1, explanation: 'O bloco privado é 172.16.0.0/12, que cobre o segundo octeto de 16 até 31.' },
+    { prompt: 'Por que não basta observar que dois endereços começam com 192.168 para decidir se comunicam localmente?', options: ['Porque a máscara/prefixo determina a fronteira da sub-rede', 'Porque endereços privados nunca se comunicam', 'Porque o DNS sempre decide a rede local', 'Porque todo endereço 192.168 é uma sub-rede /16'], answer: 0, explanation: 'A comparação de sub-rede depende do endereço e da máscara/prefixo. Redes privadas podem ser subdivididas em vários prefixos.' },
+    { prompt: 'Qual comando PowerShell mostra a configuração IP por interface no Windows?', options: ['Get-NetIPConfiguration', 'Get-Service', 'Get-EventLog', 'Get-LocalUser'], answer: 0, explanation: 'Get-NetIPConfiguration apresenta configuração IP e gateway por interface; compare a interface ativa com o segmento esperado.' }
+  ],
+  subnetting: [
+    { prompt: 'Qual é o broadcast de 10.20.30.128/27?', options: ['10.20.30.143', '10.20.30.159', '10.20.30.160', '10.20.30.255'], answer: 1, explanation: 'Um /27 tem blocos de 32. O bloco iniciado em .128 termina em .159; esse último endereço é o broadcast.' },
+    { prompt: 'Em uma sub-rede IPv4 tradicional /28, quantos endereços de host são utilizáveis?', options: ['12', '14', '16', '30'], answer: 1, explanation: 'Um /28 tem 4 bits de host: 16 endereços totais. Descontando rede e broadcast, restam 14 hosts tradicionais.' },
+    { prompt: 'Qual sub-rede /28 contém 172.16.5.77?', options: ['172.16.5.48/28', '172.16.5.64/28', '172.16.5.72/28', '172.16.5.80/28'], answer: 1, explanation: 'Os blocos /28 avançam de 16 em 16. .77 fica no intervalo .64–.79; a rede é .64 e o broadcast .79.' },
+    { prompt: 'Uma rede /24 será dividida em quatro sub-redes iguais. Qual prefixo resulta?', options: ['/25', '/26', '/27', '/28'], answer: 1, explanation: 'Quatro sub-redes exigem emprestar 2 bits, pois 2² = 4. O prefixo passa de /24 para /26.' },
+    { prompt: 'Qual é a máscara decimal pontuada de /27?', options: ['255.255.255.0', '255.255.255.192', '255.255.255.224', '255.255.255.240'], answer: 2, explanation: 'Um /27 tem 27 bits 1: 255.255.255.224. O tamanho de bloco no último octeto é 32.' }
+  ]
+};
+
+const reviewIntervals = [1, 3, 7, 14, 30];
+const lessonReferences = {
+  fundamentos: [
+    { label: 'Microsoft Learn — ipconfig', url: 'https://learn.microsoft.com/windows-server/administration/windows-commands/ipconfig' },
+    { label: 'RFC 1122 — Requirements for Internet Hosts', url: 'https://www.rfc-editor.org/rfc/rfc1122' }
+  ],
+  osi: [
+    { label: 'Microsoft Learn — Test-NetConnection', url: 'https://learn.microsoft.com/powershell/module/nettcpip/test-netconnection?view=windowsserver2025-ps' },
+    { label: 'RFC 1122 — Requirements for Internet Hosts', url: 'https://www.rfc-editor.org/rfc/rfc1122' }
+  ],
+  ipv4: [
+    { label: 'RFC 1918 — Address Allocation for Private Internets', url: 'https://www.rfc-editor.org/rfc/rfc1918' },
+    { label: 'RFC 4632 — Classless Inter-domain Routing (CIDR)', url: 'https://www.rfc-editor.org/rfc/rfc4632' },
+    { label: 'Microsoft Learn — Get-NetIPConfiguration', url: 'https://learn.microsoft.com/powershell/module/nettcpip/get-netipconfiguration?view=windowsserver2025-ps' }
+  ],
+  subnetting: [
+    { label: 'RFC 4632 — Classless Inter-domain Routing (CIDR)', url: 'https://www.rfc-editor.org/rfc/rfc4632' },
+    { label: 'RFC 1878 — Variable Length Subnet Table', url: 'https://www.rfc-editor.org/rfc/rfc1878' }
+  ]
+};
+
 const diagnosticQuestions = [
   { id: 'next-hop', area: 'redes', areaLabel: 'Fundamentos de rede', level: 'Fundamentos', prompt: 'Um computador precisa enviar dados para um servidor em outra sub-rede. A qual endereço MAC ele entrega o primeiro quadro?', options: ['Ao MAC do servidor remoto', 'Ao MAC do gateway padrão', 'Ao MAC do servidor DNS', 'A um MAC broadcast da Internet'], answer: 1, explanation: 'O host entrega o quadro local ao MAC do próximo salto, normalmente o gateway. O pacote IP continua com o endereço do servidor como destino.' },
   { id: 'switch-learning', area: 'redes', areaLabel: 'Fundamentos de rede', level: 'Intermediário', prompt: 'Com base em que informação um switch de camada 2 aprende por qual porta encaminhar um MAC?', options: ['No MAC de origem do quadro recebido e na VLAN', 'No endereço DNS do computador', 'Na porta TCP de destino', 'No gateway padrão do host'], answer: 0, explanation: 'O switch aprende MAC de origem por porta e VLAN; depois usa a tabela CAM para encaminhar quadros conhecidos.' },
@@ -130,16 +182,19 @@ const initialState = {
   profile: null,
   theme: 'light',
   route: 'dashboard',
+  diagnosticSkipped: false,
   selectedModule: 'fundamentos',
   assessment: { answers: {}, currentIndex: 0, result: null, awarded: false },
   completed: [],
+  quizAttempts: {},
+  quizAwards: [],
   favorites: [],
   notes: [],
   review: {},
   projects: {},
   lab: { incidentId: 'dns-app', evidence: [], report: '', hypothesis: '' },
   xp: 0,
-  streak: 1,
+  streak: 0,
   lastStudyDate: '',
   startedAt: new Date().toISOString()
 };
@@ -155,6 +210,10 @@ function mergeUserState(saved = {}) {
     ...initialState,
     ...saved,
     completed: Array.isArray(saved.completed) ? saved.completed : [],
+    quizAttempts: saved.quizAttempts && typeof saved.quizAttempts === 'object' && !Array.isArray(saved.quizAttempts)
+      ? Object.fromEntries(Object.entries(saved.quizAttempts).filter(([, attempts]) => Array.isArray(attempts)))
+      : {},
+    quizAwards: Array.isArray(saved.quizAwards) ? saved.quizAwards : [],
     favorites: Array.isArray(saved.favorites) ? saved.favorites : [],
     notes: Array.isArray(saved.notes) ? saved.notes : [],
     review: saved.review || {},
@@ -194,6 +253,13 @@ const escapeHTML = (value = '') => String(value).replace(/[&<>"']/g, (char) => (
 const progressPercent = () => Math.round((state.completed.length / modules.length) * 100);
 const moduleById = (id) => modules.find((item) => item.id === id) || modules[0];
 const selectedIncident = () => incidents.find((item) => item.id === state.lab.incidentId) || incidents[0];
+const quizAttemptCount = () => Object.values(state.quizAttempts).reduce((total, attempts) => total + (Array.isArray(attempts) ? attempts.length : 0), 0);
+const dueReviewModules = (now = Date.now()) => modules.filter((item) => state.review[item.id]?.due <= now && (state.quizAttempts[item.id] || []).length);
+
+function latestQuizAttempt(moduleId) {
+  const attempts = state.quizAttempts[moduleId] || [];
+  return Array.isArray(attempts) ? attempts[attempts.length - 1] || null : null;
+}
 
 function saveState() {
   if (state.profile?.name) {
@@ -284,7 +350,7 @@ function shell(content) {
           ${navLink('notes', 'Minhas anotações', 'note')}
           ${navLink('favorites', 'Favoritos', 'star')}
           ${navLink('review', 'Revisão espaçada', 'calendar')}
-          ${navLink('progress', 'Progresso e skills', 'calendar', 'progress')}
+          ${navLink('progress', 'Progresso e avaliações', 'calendar', 'progress')}
           ${navLink('assessment', 'Avaliação de nível', 'target')}
         </nav>
         <div class="sidebar-bottom">
@@ -317,21 +383,27 @@ function dashboardView() {
   const recentNote = state.notes[state.notes.length - 1];
   const diagnosticCard = state.assessment.result ? assessmentDashboardSummary() : `<section class="assessment-entry panel"><div><p class="section-kicker">PONTO DE PARTIDA</p><h2>Ainda não mapeamos seu nível</h2><p>Faça uma avaliação rápida para descobrir em quais assuntos você já tem base e por onde vale começar.</p></div><button class="primary-action" data-action="start-assessment" type="button">Fazer diagnóstico ${icon('arrow')}</button></section>`;
   return `
-    ${pageHeader('QUARTA-FEIRA · ROTEIRO DE ESTUDO', `Olá, ${escapeHTML(state.profile?.name?.split(' ')[0] || 'estudante')}.`, 'Seu espaço de prática está pronto. Continue de onde parou ou investigue um incidente.')}
+    ${pageHeader('SEU ROTEIRO DE ESTUDO', `Olá, ${escapeHTML(state.profile?.name?.split(' ')[0] || 'estudante')}.`, 'Seu espaço de prática está pronto. Continue de onde parou ou investigue um incidente.')}
     ${diagnosticCard}
     <section class="continue-strip">
       <div class="continue-copy"><p class="micro-label">CONTINUE DE ONDE PAROU <span class="status-tag">EM ANDAMENTO</span></p><h2>Redes para Suporte N1 → N2</h2><p>${escapeHTML(next.title)} <span class="muted-separator">/</span> ${escapeHTML(next.group)}</p><div class="progress-track"><span style="width:${progressPercent()}%"></span></div><small>${progressPercent()}% da trilha · ${state.completed.length} de ${modules.length} módulos concluídos</small></div>
       <button class="continue-button" data-action="open-module" data-id="${next.id}" type="button">Continuar ${icon('arrow')}</button>
     </section>
-    <div class="metric-row"><article class="metric-tile"><span>TRILHA ATIVA</span><strong>01 <small>/ 12</small></strong><p>Redes e suporte</p></article><article class="metric-tile"><span>XP ACUMULADO</span><strong>${state.xp}</strong><p>Nível ${levelForXp(state.xp)} · ${nextLevelLabel(state.xp)}</p></article><article class="metric-tile"><span>SEQUÊNCIA</span><strong>${state.streak} <small>dia${state.streak === 1 ? '' : 's'}</small></strong><p>Ritmo de estudo local</p></article><article class="metric-tile"><span>REVISÕES</span><strong>${Math.max(0, state.completed.length ? 1 : 0)}</strong><p>${state.completed.length ? 'DNS · sugerido para revisar' : 'Conclua uma aula para começar'}</p></article></div>
+    <div class="metric-row"><article class="metric-tile"><span>TESTES REALIZADOS</span><strong>${quizAttemptCount()}</strong><p>Questionários respondidos</p></article><article class="metric-tile"><span>XP ACUMULADO</span><strong>${state.xp}</strong><p>Nível ${levelForXp(state.xp)} · ${nextLevelLabel(state.xp)}</p></article><article class="metric-tile"><span>SEQUÊNCIA</span><strong>${state.streak} <small>dia${state.streak === 1 ? '' : 's'}</small></strong><p>Ritmo de estudo local</p></article><article class="metric-tile"><span>REVISÕES PENDENTES</span><strong>${dueReviewModules().length}</strong><p>${dueReviewModules().length ? 'Baseado nos resultados dos testes' : 'Nenhuma revisão vencida'}</p></article></div>
     <div class="dashboard-columns"><section class="panel learning-panel"><div class="panel-heading"><div><p class="section-kicker">SEU WORKSPACE</p><h2>Trilhas de carreira</h2></div><button class="text-button" data-route="tracks" type="button">Ver todas ${icon('arrow')}</button></div><div class="track-list">${tracks.slice(0, 4).map((track, index) => `<button class="track-row ${track.active ? 'track-active' : ''}" type="button" data-action="open-track" data-id="${track.id}"><span class="track-index">0${index + 1}</span><span class="track-detail"><strong>${escapeHTML(track.title)}</strong><small>${escapeHTML(track.description)}</small></span><span class="track-state ${track.active ? 'state-active' : ''}">${track.active ? `${progressPercent()}%` : 'ROTEIRO'}</span>${icon('arrow')}</button>`).join('')}</div></section>
     <section class="panel focus-panel"><div class="panel-heading"><div><p class="section-kicker">PRÓXIMA AÇÃO</p><h2>Investigue um chamado</h2></div><span class="panel-icon">${icon('target')}</span></div><p>Treine a triagem por evidências. Execute os testes em ordem, formule uma hipótese e registre uma resolução.</p><div class="incident-preview"><span class="priority-dot"></span><div><strong>${escapeHTML(incidents[0].title)}</strong><small>INCIDENTE · ${incidents[0].level} · 8–12 MIN</small></div></div><button class="outline-button full-width" data-route="lab" type="button">Abrir troubleshooting lab ${icon('arrow')}</button></section></div>
-    <div class="dashboard-columns second-row"><section class="panel"><div class="panel-heading"><div><p class="section-kicker">HABILIDADES</p><h2>Mapa de skills</h2></div><button class="text-button" data-route="progress" type="button">Detalhes ${icon('arrow')}</button></div>${skillBars()}</section><section class="panel"><div class="panel-heading"><div><p class="section-kicker">PROJETO ATIVO</p><h2>Kit NETCHECK</h2></div><span class="project-status">EM CURSO</span></div><p>Construa um roteiro de coleta de rede no PowerShell e gere um resumo técnico reproduzível.</p><div class="project-mini-progress"><span style="width:${projectProgress('netcheck')}%"></span></div><button class="text-button" data-route="projects" type="button">Abrir projeto ${icon('arrow')}</button>${recentNote ? `<p class="last-note"><strong>Última anotação:</strong> ${escapeHTML(recentNote.text.slice(0, 100))}</p>` : ''}</section></div>`;
+    <div class="dashboard-columns second-row"><section class="panel"><div class="panel-heading"><div><p class="section-kicker">AVALIAÇÕES</p><h2>Desempenho por tema</h2></div><button class="text-button" data-route="progress" type="button">Detalhes ${icon('arrow')}</button></div>${skillBars()}</section><section class="panel"><div class="panel-heading"><div><p class="section-kicker">PROJETO ATIVO</p><h2>Kit NETCHECK</h2></div><span class="project-status">EM CURSO</span></div><p>Construa um roteiro de coleta de rede no PowerShell e gere um resumo técnico reproduzível.</p><div class="project-mini-progress"><span style="width:${projectProgress('netcheck')}%"></span></div><button class="text-button" data-route="projects" type="button">Abrir projeto ${icon('arrow')}</button>${recentNote ? `<p class="last-note"><strong>Última anotação:</strong> ${escapeHTML(recentNote.text.slice(0, 100))}</p>` : ''}</section></div>`;
 }
 
 function skillBars() {
-  const skills = [['Redes', Math.min(100, 18 + state.completed.length * 4)], ['Windows', Math.min(100, 12 + state.completed.length * 2)], ['PowerShell', state.completed.includes('powershell') ? 40 : 8], ['Cloud', 0]];
-  return `<div class="skill-bars">${skills.map(([label, amount]) => `<div class="skill-line"><span>${label}</span><div class="skill-track"><i style="width:${amount}%"></i></div><strong>${amount}%</strong></div>`).join('')}</div>`;
+  const groups = [...new Set(Object.keys(quizBank).map((id) => moduleById(id).group))];
+  const results = groups.map((group) => {
+    const groupScores = modules.filter((item) => item.group === group && quizBank[item.id]).map((item) => latestQuizAttempt(item.id)?.score).filter((score) => Number.isFinite(score));
+    return { group, score: groupScores.length ? Math.round(groupScores.reduce((sum, score) => sum + score, 0) / groupScores.length) : null, tested: groupScores.length };
+  });
+  const tested = results.filter((item) => item.score !== null);
+  if (!tested.length) return '<p class="assessment-empty">Ainda não há resultados. Faça os questionários disponíveis nas primeiras aulas para acompanhar seu desempenho.</p>';
+  return `<div class="skill-bars">${tested.map(({ group, score, tested: count }) => `<div class="skill-line"><span>${escapeHTML(group)}</span><div class="skill-track"><i style="width:${score}%"></i></div><strong>${score}%</strong><small>${count} módulo${count === 1 ? '' : 's'} avaliado${count === 1 ? '' : 's'}</small></div>`).join('')}<p class="assessment-disclaimer">Média das tentativas mais recentes; indica desempenho em questionários, não domínio prático certificado.</p></div>`;
 }
 
 function tracksView() {
@@ -343,7 +415,25 @@ function courseView() {
   const groups = [...new Set(modules.map((item) => item.group))];
   return `${pageHeader('TRILHA ATIVA · 23 MÓDULOS', 'Redes para Suporte N1 → N2', 'Aprenda por camadas, valide cada hipótese e registre evidências. A sequência completa está organizada abaixo.')}
     <div class="course-overview panel"><div><p class="section-kicker">OBJETIVO DA TRILHA</p><h2>Diagnosticar conectividade até a aplicação</h2><p>Pré-requisitos: nenhum. Nível: fundamentos a N2. Projeto final: incidente documentado da empresa virtual.</p></div><div class="course-overview-score"><strong>${progressPercent()}%</strong><small>CONCLUÍDO</small></div></div>
-    ${groups.map((group) => `<section class="module-group"><div class="group-heading"><h2>${escapeHTML(group)}</h2><span>${modules.filter((item) => item.group === group).length} módulos</span></div><div class="module-list">${modules.filter((item) => item.group === group).map((item, index) => `<button class="module-row ${state.completed.includes(item.id) ? 'is-complete' : ''} ${state.selectedModule === item.id ? 'is-current' : ''}" data-action="open-module" data-id="${item.id}" type="button"><span class="module-index">${state.completed.includes(item.id) ? icon('check') : String(modules.indexOf(item) + 1).padStart(2, '0')}</span><span class="module-row-copy"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.goal)}</small></span><span class="module-level">${index === 0 ? '10 MIN' : '15 MIN'}</span>${icon('arrow')}</button>`).join('')}</div></section>`).join('')}`;
+    ${groups.map((group) => `<section class="module-group"><div class="group-heading"><h2>${escapeHTML(group)}</h2><span>${modules.filter((item) => item.group === group).length} módulos</span></div><div class="module-list">${modules.filter((item) => item.group === group).map((item, index) => `<button class="module-row ${state.completed.includes(item.id) ? 'is-complete' : ''} ${state.selectedModule === item.id ? 'is-current' : ''}" data-action="open-module" data-id="${item.id}" type="button"><span class="module-index">${state.completed.includes(item.id) ? icon('check') : String(modules.indexOf(item) + 1).padStart(2, '0')}</span><span class="module-row-copy"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.goal)}</small></span><span class="module-level">${quizBank[item.id] ? 'TESTE · 5Q' : index === 0 ? '10 MIN' : '15 MIN'}</span>${icon('arrow')}</button>`).join('')}</div></section>`).join('')}`;
+}
+
+function referencesSection(item) {
+  const references = lessonReferences[item.id];
+  if (!references) return '';
+  return `<section class="lesson-references"><p class="section-kicker">REFERÊNCIAS OFICIAIS</p><ul>${references.map((reference) => `<li><a href="${reference.url}" target="_blank" rel="noopener noreferrer">${escapeHTML(reference.label)}</a></li>`).join('')}</ul></section>`;
+}
+
+function quizSection(item) {
+  const questions = quizBank[item.id];
+  if (!questions) return '';
+  const previous = latestQuizAttempt(item.id);
+  const review = state.review[item.id];
+  const feedback = previous ? `<div class="quiz-result ${previous.passed ? 'quiz-passed' : 'quiz-needs-review'}"><strong>${previous.passed ? 'Atingiu a referência de aprovação' : 'Ainda abaixo da referência de 80%'}</strong><span>${previous.correct}/${previous.total} · ${previous.score}%</span><small>Tentativa em ${new Date(previous.attemptedAt).toLocaleString('pt-BR')}${review?.due ? ` · próxima revisão ${new Date(review.due).toLocaleDateString('pt-BR')}` : ''}</small><div class="quiz-corrections">${questions.map((question, index) => {
+    const selected = previous.answers[index];
+    return `<article class="${selected === question.answer ? 'answer-correct' : 'answer-incorrect'}"><strong>Questão ${index + 1}: ${selected === question.answer ? 'correta' : 'incorreta'}</strong><p>Resposta correta: ${escapeHTML(question.options[question.answer])}</p><small>${escapeHTML(question.explanation)}</small></article>`;
+  }).join('')}</div></div>` : '<p class="assessment-empty">Ainda sem tentativas. Responda antes de consultar o feedback.</p>';
+  return `<section class="lesson-quiz"><p class="section-kicker">08 · AVALIAÇÃO DO MÓDULO</p><h2>Teste de conhecimento</h2><p class="quiz-intro">São ${questions.length} questões com correção e justificativa. A referência de aprovação é 80%; o resultado mede este questionário, não comprova sozinho uma competência prática.</p>${feedback}<form class="quiz-form" data-quiz-module="${item.id}">${questions.map((question, questionIndex) => `<fieldset class="quiz-question"><legend>${questionIndex + 1}. ${escapeHTML(question.prompt)}</legend>${question.options.map((option, optionIndex) => `<label class="quiz-option"><input type="radio" name="quiz-answer-${item.id}-${questionIndex}" value="${optionIndex}"><span>${escapeHTML(option)}</span></label>`).join('')}</fieldset>`).join('')}<p class="quiz-status" data-quiz-status role="status" aria-live="polite"></p><button class="primary-action" data-action="submit-module-quiz" data-id="${item.id}" type="button">Corrigir teste ${icon('arrow')}</button></form></section>`;
 }
 
 function lessonView() {
@@ -364,6 +454,8 @@ function lessonView() {
       <section><p class="section-kicker">06 · CHECKPOINT</p><h2>Recupere o conceito de memória</h2><details class="checkpoint checkpoint-question"><summary>${icon('bulb')} ${escapeHTML(item.check)}</summary><p>${escapeHTML(item.checkAnswer)}</p></details><p class="checkpoint-instruction">Responda em voz alta ou escreva uma tentativa nas anotações antes de revelar a solução. Depois explique por que as alternativas incorretas não se aplicam.</p></section>
       <section><p class="section-kicker">07 · APLICAÇÃO E DOCUMENTAÇÃO</p><h2>Como isso aparece no trabalho</h2><p>Use o conhecimento para reduzir hipóteses, não para justificar uma mudança prematura. Registre fatos observados separadamente das conclusões:</p><div class="documentation-block"><span>REGISTRO MÍNIMO</span><p>${escapeHTML(item.document)}</p></div><p class="practice-assignment"><strong>Prática da aula:</strong> ${escapeHTML(item.practice)}</p></section>
       <section class="lesson-note-section"><label for="lesson-note">ANOTAÇÃO DESTA AULA</label><textarea id="lesson-note" data-note-module="${item.id}" placeholder="Registre sua tentativa, resultado, dúvidas e evidências importantes...">${escapeHTML(matchingNote?.text || '')}</textarea><button class="outline-button" data-action="save-lesson-note" data-id="${item.id}" type="button">Salvar anotação</button></section>
+      ${quizSection(item)}
+      ${referencesSection(item)}
       <div class="lesson-actions"><button class="outline-button" data-action="favorite-module" data-id="${item.id}" type="button">${icon('star')} ${isFavorite ? 'Remover dos favoritos' : 'Favoritar aula'}</button><button class="primary-action" data-action="complete-module" data-id="${item.id}" type="button">${isComplete ? 'Aula concluída' : 'Marcar como concluída'} ${icon('check')}</button></div>
     </article><aside class="panel lesson-aside"><p class="section-kicker">AO FINAL VOCÊ CONSEGUE</p><ul><li>Explicar o conceito sem decorar uma definição.</li><li>Executar o teste relacionado.</li><li>Interpretar o resultado com limites.</li><li>Aplicar o raciocínio em um incidente.</li></ul><div class="aside-divider"></div><p class="section-kicker">TRILHA DA AULA</p><ol class="lesson-outline"><li>Conceito e mecanismo</li><li>Exemplo e investigação</li><li>Comando e interpretação</li><li>Exercício e checkpoint</li><li>Aplicação e documentação</li></ol><div class="aside-divider"></div><p class="section-kicker">PRÓXIMO MÓDULO</p><strong>${escapeHTML(modules[(index + 1) % modules.length].title)}</strong><button class="text-button" data-action="open-module" data-id="${modules[(index + 1) % modules.length].id}" type="button">Ir para próxima aula ${icon('arrow')}</button><div class="aside-tip"><strong>Prática recomendada</strong><p>Abra o terminal simulado e execute o comando da aula. As saídas são didáticas, não executam comandos reais no Windows.</p><button class="text-button" data-route="terminal" type="button">Abrir terminal ${icon('arrow')}</button></div></aside></div>`;
 }
@@ -389,11 +481,14 @@ function challengeView() {
 }
 
 function reviewView() {
-  const candidates = state.completed.map((id) => moduleById(id));
-  const reviewItems = candidates.filter((item) => !state.review[item.id] || state.review[item.id].due <= Date.now());
-  const list = reviewItems.length ? reviewItems : candidates.slice(-3);
-  return `${pageHeader('RECALL ATIVO · REVISÃO ESPAÇADA', 'Revisões', 'Tente recordar o conceito antes de abrir a aula. Sua resposta define quando o assunto volta à fila.')}
-    <div class="review-list">${list.map((item) => `<article class="panel review-card"><div><span class="status-tag">${escapeHTML(item.group)}</span><h2>${escapeHTML(item.title)}</h2><p>${escapeHTML(item.check)}</p></div><div class="review-actions"><button class="review-rating" data-action="review-rate" data-id="${item.id}" data-rating="again" type="button">Tenho dificuldade</button><button class="review-rating" data-action="review-rate" data-id="${item.id}" data-rating="hard" type="button">Rever em breve</button><button class="review-rating rating-easy" data-action="review-rate" data-id="${item.id}" data-rating="easy" type="button">Lembrei</button></div></article>`).join('') || '<div class="panel empty-state">Conclua uma aula para começar sua fila de revisão espaçada.</div>'}</div>`;
+  const due = dueReviewModules();
+  const upcoming = modules.filter((item) => state.review[item.id]?.due > Date.now() && (state.quizAttempts[item.id] || []).length).sort((first, second) => state.review[first.id].due - state.review[second.id].due);
+  return `${pageHeader('RECALL ATIVO · REVISÃO ESPAÇADA', 'Revisões', 'A fila usa os resultados dos questionários: erro antecipa o retorno; acertos consecutivos ampliam o intervalo até 30 dias.')}
+    <div class="review-list">${due.map((item) => {
+      const lastAttempt = latestQuizAttempt(item.id);
+      return `<article class="panel review-card"><div><span class="status-tag">REVISÃO VENCIDA · ${escapeHTML(item.group)}</span><h2>${escapeHTML(item.title)}</h2><p>Último resultado: ${lastAttempt.correct}/${lastAttempt.total} (${lastAttempt.score}%). Refaça o teste na aula para atualizar o intervalo.</p></div><button class="primary-action" data-action="open-module" data-id="${item.id}" type="button">Revisar agora ${icon('arrow')}</button></article>`;
+    }).join('') || '<div class="panel empty-state">Nenhuma revisão vencida. Quando chegar a data de um conteúdo avaliado, ele aparecerá aqui.</div>'}
+    ${upcoming.length ? `<section class="upcoming-reviews"><p class="section-kicker">PRÓXIMAS REVISÕES</p>${upcoming.map((item) => `<article class="panel review-card"><div><span class="status-tag">${escapeHTML(item.group)}</span><h2>${escapeHTML(item.title)}</h2><p>Próxima revisão: ${new Date(state.review[item.id].due).toLocaleDateString('pt-BR')} · último resultado: ${state.review[item.id].lastScore}%</p></div></article>`).join('')}</section>` : ''}</div>`;
 }
 
 function testLabels(test) {
@@ -435,7 +530,7 @@ function notesView(favoritesOnly = false) {
 
 function progressView() {
   return `${pageHeader('TEU DESENVOLVIMENTO', 'Progresso e habilidades', 'Progresso salvo localmente neste dispositivo. Marque aulas concluídas após praticar e revisar os checkpoints.')}
-    <div class="progress-overview panel"><div><p class="section-kicker">REDES PARA SUPORTE N1 → N2</p><h2>${state.completed.length} de ${modules.length} módulos concluídos</h2><div class="progress-track"><span style="width:${progressPercent()}%"></span></div></div><strong>${progressPercent()}%</strong></div><div class="progress-skill-panel panel"><div class="panel-heading"><div><p class="section-kicker">MAPA DE SKILLS</p><h2>Capacidade percebida</h2></div></div>${skillBars()}<p class="subnet-hint">Indicadores de aprendizado inicial, não uma certificação de competência. Use os projetos e laboratórios para validar habilidades.</p></div><div class="module-list">${modules.map((item) => `<button class="module-row ${state.completed.includes(item.id) ? 'is-complete' : ''}" data-action="open-module" data-id="${item.id}" type="button"><span class="module-index">${state.completed.includes(item.id) ? icon('check') : '○'}</span><span class="module-row-copy"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.group)}</small></span><span class="module-level">${state.completed.includes(item.id) ? 'CONCLUÍDO' : 'PENDENTE'}</span>${icon('arrow')}</button>`).join('')}</div>`;
+    <div class="progress-overview panel"><div><p class="section-kicker">REDES PARA SUPORTE N1 → N2</p><h2>${state.completed.length} de ${modules.length} módulos concluídos</h2><div class="progress-track"><span style="width:${progressPercent()}%"></span></div></div><strong>${progressPercent()}%</strong></div><div class="progress-skill-panel panel"><div class="panel-heading"><div><p class="section-kicker">RESULTADOS REGISTRADOS</p><h2>Desempenho em questionários</h2></div></div>${skillBars()}<p class="subnet-hint">As porcentagens refletem a tentativa mais recente dos módulos avaliados. Elas não equivalem a domínio prático nem a uma certificação.</p></div><div class="module-list">${modules.map((item) => `<button class="module-row ${state.completed.includes(item.id) ? 'is-complete' : ''}" data-action="open-module" data-id="${item.id}" type="button"><span class="module-index">${state.completed.includes(item.id) ? icon('check') : '○'}</span><span class="module-row-copy"><strong>${escapeHTML(item.title)}</strong><small>${escapeHTML(item.group)}</small></span><span class="module-level">${state.completed.includes(item.id) ? 'CONCLUÍDO' : 'PENDENTE'}</span>${icon('arrow')}</button>`).join('')}</div>`;
 }
 
 function profileView() {
@@ -450,6 +545,7 @@ function assessmentView() {
   const selected = state.assessment.answers[question.id];
   return `${pageHeader('PONTO DE PARTIDA · 8–10 MIN', 'Avaliação diagnóstica', 'Um retrato inicial do que você já conhece. Não é prova de certificação: use o resultado para escolher o próximo estudo.')}
     <section class="assessment-shell panel"><div class="assessment-topline"><span class="status-tag">${escapeHTML(question.areaLabel)}</span><span>${escapeHTML(question.level)}</span></div><div class="assessment-progress"><span style="width:${progress}%"></span></div><div class="assessment-counter">QUESTÃO ${String(index + 1).padStart(2, '0')} <span>/ ${diagnosticQuestions.length}</span></div><fieldset class="assessment-question"><legend>${escapeHTML(question.prompt)}</legend><div class="assessment-options">${question.options.map((option, optionIndex) => `<label class="assessment-option ${selected === optionIndex ? 'selected' : ''}"><input type="radio" name="assessment-answer" value="${optionIndex}" ${selected === optionIndex ? 'checked' : ''}><span class="option-marker">${String.fromCharCode(65 + optionIndex)}</span><span>${escapeHTML(option)}</span></label>`).join('')}</div></fieldset><div class="assessment-controls"><button class="outline-button" data-action="assessment-previous" type="button" ${index === 0 ? 'disabled' : ''}>Voltar</button><span class="assessment-save-state">Suas respostas são salvas neste navegador.</span>${index === diagnosticQuestions.length - 1 ? `<button class="primary-action" data-action="assessment-finish" type="button" ${selected === undefined ? 'disabled' : ''}>Ver meu resultado ${icon('arrow')}</button>` : `<button class="primary-action" data-action="assessment-next" type="button" ${selected === undefined ? 'disabled' : ''}>Próxima questão ${icon('arrow')}</button>`}</div></section>
+    <div class="assessment-skip-wrap"><button class="text-button" data-action="skip-assessment" type="button">Pular avaliação e ir para o dashboard ${icon('arrow')}</button><p>Você pode fazer o diagnóstico depois pelo menu “Avaliação de nível”.</p></div>
     <div class="assessment-footnote">Responda sem pesquisar para obter um retrato mais útil. Errar é informação para recomendar o melhor ponto de partida.</div>`;
 }
 
@@ -497,7 +593,7 @@ function render() {
     root.innerHTML = `<main class="login-screen"><div class="login-side"><div class="login-logo">N<span>.</span></div><p class="section-kicker">NODE / STUDY · LOCAL LAB</p><h1>Seu ambiente de estudos em TI.</h1><p>Aprenda, investigue, pratique e documente. Um espaço pessoal para desenvolver raciocínio técnico com situações de suporte.</p><div class="login-flow"><span>APRENDER</span><i>→</i><span>INVESTIGAR</span><i>→</i><span>DOCUMENTAR</span></div><div class="login-network" aria-hidden="true"><span></span><span></span><span></span><span></span><i></i><i></i></div></div><section class="login-form-side"><form class="login-form" id="login-form"><p class="section-kicker">PERFIL LOCAL</p><h2>${previousName ? `Bem-vindo de volta, ${escapeHTML(previousName)}.` : 'Entrar no laboratório'}</h2><p>Digite o mesmo nome para retomar aulas, notas e progresso salvos neste navegador.</p><label for="login-name">Nome do perfil</label><input id="login-name" name="name" value="${escapeHTML(previousName)}" list="saved-local-users" placeholder="Seu nome" autocomplete="name" required minlength="2" maxlength="50"><datalist id="saved-local-users">${savedUsers.map((user) => `<option value="${escapeHTML(user.name)}"></option>`).join('')}</datalist><button class="primary-action" type="submit">${previousName ? 'Retomar meu espaço' : 'Criar perfil local'} ${icon('arrow')}</button>${savedUsers.length ? `<div class="saved-profiles"><span>PERFIS NESTE NAVEGADOR</span><div>${savedUsers.map((user) => `<button type="button" data-action="select-local-user" data-user-key="${escapeHTML(user.key)}">${escapeHTML(user.name)}</button>`).join('')}</div></div>` : ''}<small>Os dados são salvos neste navegador. Esse perfil local não usa senha nem protege o acesso como uma conta online.</small></form></section></main>`;
     return;
   }
-  if (!state.assessment.result && state.route !== 'assessment') {
+  if (!state.assessment.result && !state.diagnosticSkipped && state.route !== 'assessment') {
     state.route = 'assessment';
     saveState();
   }
@@ -524,9 +620,16 @@ function navigate(route) {
 
 function awardXp(amount) {
   state.xp += amount;
+  recordStudyActivity();
+}
+
+function recordStudyActivity() {
   const today = new Date().toISOString().slice(0, 10);
   if (state.lastStudyDate !== today) {
-    state.streak = state.lastStudyDate ? Math.max(1, state.streak + 1) : 1;
+    const previousDay = state.lastStudyDate ? Date.parse(`${state.lastStudyDate}T00:00:00Z`) : 0;
+    const currentDay = Date.parse(`${today}T00:00:00Z`);
+    const dayGap = previousDay ? Math.round((currentDay - previousDay) / 86400000) : 0;
+    state.streak = dayGap === 1 ? state.streak + 1 : 1;
     state.lastStudyDate = today;
   }
 }
@@ -619,7 +722,8 @@ root.addEventListener('click', (event) => {
   }
   if (action === 'open-module') { state.selectedModule = id; state.route = 'lesson'; saveState(); render(); }
   if (action === 'open-track') { navigate(id === 'track-3' ? 'course' : 'tracks'); }
-  if (action === 'start-assessment') { state.assessment = { answers: {}, currentIndex: 0, result: null, awarded: state.assessment.awarded }; state.route = 'assessment'; saveState(); render(); }
+  if (action === 'start-assessment') { state.assessment = { answers: {}, currentIndex: 0, result: null, awarded: state.assessment.awarded }; state.diagnosticSkipped = false; state.route = 'assessment'; saveState(); render(); }
+  if (action === 'skip-assessment') { state.diagnosticSkipped = true; state.route = 'dashboard'; saveState(); render(); window.scrollTo({ top: 0, behavior: 'instant' }); }
   if (action === 'assessment-previous') { state.assessment.currentIndex = Math.max(0, state.assessment.currentIndex - 1); saveState(); render(); }
   if (action === 'assessment-next') { const current = diagnosticQuestions[state.assessment.currentIndex]; if (state.assessment.answers[current.id] !== undefined) { state.assessment.currentIndex = Math.min(diagnosticQuestions.length - 1, state.assessment.currentIndex + 1); saveState(); render(); } }
   if (action === 'assessment-finish') {
@@ -631,6 +735,50 @@ root.addEventListener('click', (event) => {
     }
   }
   if (action === 'assessment-dashboard') { state.route = 'dashboard'; saveState(); render(); }
+  if (action === 'submit-module-quiz') {
+    const questions = quizBank[id];
+    if (!questions) return;
+    const answers = questions.map((_, index) => {
+      const selected = root.querySelector(`input[name="quiz-answer-${id}-${index}"]:checked`);
+      return selected ? Number(selected.value) : null;
+    });
+    const status = root.querySelector('[data-quiz-status]');
+    if (answers.some((answer) => answer === null)) {
+      if (status) status.textContent = 'Responda todas as questões antes de corrigir o teste.';
+      return;
+    }
+    const correct = questions.reduce((total, question, index) => total + (answers[index] === question.answer ? 1 : 0), 0);
+    const passed = correct / questions.length >= 0.8;
+    const attemptedAt = new Date().toISOString();
+    const attempt = { attemptedAt, correct, total: questions.length, score: Math.round(correct / questions.length * 100), answers, passed };
+    state.quizAttempts[id] = [...(state.quizAttempts[id] || []), attempt];
+    const priorReview = state.review[id] || {};
+    const now = Date.now();
+    const hasReviewInterval = Number.isInteger(priorReview.intervalIndex);
+    const reviewWasDue = Number.isFinite(priorReview.due) && priorReview.due <= now;
+    const intervalIndex = !passed ? -1
+      : !hasReviewInterval ? 0
+        : reviewWasDue ? Math.min(priorReview.intervalIndex + 1, reviewIntervals.length - 1)
+          : priorReview.intervalIndex;
+    const due = passed && hasReviewInterval && !reviewWasDue
+      ? priorReview.due
+      : now + reviewIntervals[Math.max(0, intervalIndex)] * 86400000;
+    state.review[id] = {
+      ...priorReview,
+      intervalIndex,
+      due,
+      lastScore: attempt.score,
+      lastAttemptAt: attemptedAt,
+      firstStudiedAt: priorReview.firstStudiedAt || attemptedAt
+    };
+    recordStudyActivity();
+    if (passed && !state.quizAwards.includes(id)) {
+      state.quizAwards.push(id);
+      awardXp(20);
+    }
+    saveState();
+    render();
+  }
   if (action === 'complete-module' && !state.completed.includes(id)) { state.completed.push(id); awardXp(25); saveState(); render(); }
   if (action === 'submit-challenge') {
     const answer = document.getElementById('challenge-answer')?.value || '';
@@ -641,11 +789,6 @@ root.addEventListener('click', (event) => {
     const xp = correct && !alreadyAwarded ? 20 : 0;
     if (correct && !alreadyAwarded) awardXp(xp);
     state.challenge = { date: today, correct, xp, message: correct ? (reason.length > 15 ? 'DNS é a hipótese mais forte porque o acesso por nome falha enquanto conectividade geral e gateway foram observados. Compare a resposta DNS com o endereço esperado; se estiver correta, avance para rota e porta TCP.' : 'A escolha do teste está correta. Explique também o que a resposta confirmaria e qual seria o próximo teste se o IP estiver certo.') : 'O escopo e o sintoma apontam primeiro para resolução de nome. Evite ação disruptiva ou regra ampla antes de coletar evidência.' };
-    saveState(); render();
-  }
-  if (action === 'review-rate') {
-    const delays = { again: 1, hard: 3, easy: 7 };
-    state.review[id] = { rating: actionButton.dataset.rating, due: Date.now() + delays[actionButton.dataset.rating] * 86400000 };
     saveState(); render();
   }
   if (action === 'favorite-module') { state.favorites = state.favorites.includes(id) ? state.favorites.filter((item) => item !== id) : [...state.favorites, id]; saveState(); render(); }
@@ -698,7 +841,7 @@ root.addEventListener('submit', (event) => {
   event.preventDefault();
   if (event.target.id === 'login-form') {
     const name = new FormData(event.target).get('name').trim();
-    if (name.length >= 2) { activateLocalUser(name); awardXp(0); saveState(); render(); }
+    if (name.length >= 2) { activateLocalUser(name); saveState(); render(); }
   }
   if (event.target.id === 'profile-form') {
     state.profile = { ...state.profile, name: new FormData(event.target).get('name').trim() };

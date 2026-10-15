@@ -1,4 +1,4 @@
-name: Deploy GitHub Pages
+name: Deploy Level Up IT to GitHub Pages
 
 on:
   push:
@@ -18,17 +18,30 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: levelup-it
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          enablement: true
-      - name: Upload static site
+          node-version: 20
+          cache: npm
+          cache-dependency-path: levelup-it/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Typecheck and tests
+        run: npx tsc --noEmit && npm test
+      - name: Static export (basePath do Pages)
+        run: npm run build
+        env:
+          NEXT_BASE_PATH: /plataforma-estudos-ti
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: levelup-it/out
 
   deploy:
     environment:

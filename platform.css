@@ -92,6 +92,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .assessment-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 23px; padding-top: 16px; border-top: 1px solid var(--app-border); }
 .assessment-controls button:disabled { opacity: .45; cursor: not-allowed; }
 .assessment-save-state { color: var(--app-muted); font-size: .66rem; }
+.assessment-skip-wrap { display: grid; justify-items: center; gap: 5px; max-width: 850px; margin: 15px auto 0; }
+.assessment-skip-wrap p { margin: 0; color: var(--app-muted); font-size: .68rem; text-align: center; }
 .assessment-footnote { max-width: 850px; margin: 12px auto 0; color: var(--app-muted); font-size: .7rem; }
 .assessment-result-hero { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 14px; padding: 22px; border-left: 4px solid var(--app-accent); }
 .assessment-result-hero h2 { margin: 4px 0 7px; font-size: 1.25rem; }
@@ -182,8 +184,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .skill-bars { display: grid; gap: 14px; }
 .skill-line { display: grid; grid-template-columns: 90px 1fr 33px; align-items: center; gap: 9px; color: var(--app-muted); font-size: .72rem; }
 .skill-line strong { color: var(--app-text); font: 500 .65rem 'DM Mono', monospace; text-align: right; }
+.skill-line small { grid-column: 2 / -1; color: var(--app-muted); font-size: .65rem; }
 .skill-track { height: 6px; background: var(--app-border); }
 .skill-track i { display: block; height: 100%; background: var(--app-accent); }
+.assessment-empty, .assessment-disclaimer { margin: 0; color: var(--app-muted); font-size: .72rem; line-height: 1.65; }
+.assessment-disclaimer { padding-top: 7px; border-top: 1px solid var(--app-border); }
 .project-status { color: var(--app-gold); font: 500 .59rem 'DM Mono', monospace; }
 .project-mini-progress { margin: 15px 0; }
 .last-note { padding-top: 10px; border-top: 1px solid var(--app-border); }
@@ -268,6 +273,31 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .aside-tip { margin-top: 18px; padding: 13px; background: var(--app-panel-muted); }
 .aside-tip strong { font-size: .76rem; }
 .aside-tip p { margin: 7px 0; color: var(--app-muted); font-size: .7rem; line-height: 1.6; }
+.lesson-quiz { margin-top: 18px; padding: 18px; border: 1px solid var(--app-border); background: var(--app-panel-muted); }
+.lesson-quiz h2 { margin: 0 0 8px; font-size: 1.08rem; }
+.quiz-intro { color: var(--app-muted); font-size: .78rem; line-height: 1.7; }
+.quiz-question { margin: 13px 0; padding: 13px; border: 1px solid var(--app-border); background: var(--app-panel); }
+.quiz-question legend { padding: 0 5px; color: var(--app-text); font-size: .78rem; font-weight: 700; line-height: 1.6; }
+.quiz-option { display: flex; align-items: flex-start; gap: 9px; margin: 8px 0; padding: 9px; border: 1px solid var(--app-border); color: var(--app-muted); cursor: pointer; font-size: .74rem; line-height: 1.6; }
+.quiz-option:has(input:checked) { border-color: var(--app-accent); background: var(--app-accent-soft); color: var(--app-text); }
+.quiz-option input { margin-top: 3px; accent-color: var(--app-accent); }
+.quiz-status { min-height: 1.2em; margin: 8px 0; color: var(--app-danger); font-size: .72rem; }
+.quiz-result { display: grid; grid-template-columns: 1fr auto; gap: 5px 12px; margin: 14px 0; padding: 13px; border-left: 3px solid var(--app-gold); background: var(--app-panel); }
+.quiz-result.quiz-passed { border-left-color: var(--app-accent); }
+.quiz-result > strong { font-size: .78rem; }
+.quiz-result > span { color: var(--app-accent); font: 700 .76rem 'DM Mono', monospace; }
+.quiz-result > small { grid-column: 1 / -1; color: var(--app-muted); font-size: .67rem; }
+.quiz-corrections { display: grid; grid-column: 1 / -1; gap: 8px; margin-top: 8px; }
+.quiz-corrections article { padding: 10px; border: 1px solid var(--app-border); }
+.quiz-corrections .answer-correct { border-left: 3px solid var(--app-accent); }
+.quiz-corrections .answer-incorrect { border-left: 3px solid var(--app-danger); }
+.quiz-corrections strong { font-size: .7rem; }
+.quiz-corrections p { margin: 4px 0; color: var(--app-text); font-size: .7rem; }
+.quiz-corrections small { color: var(--app-muted); font-size: .68rem; line-height: 1.6; }
+.lesson-references { margin-top: 16px; padding: 14px 16px; border: 1px solid var(--app-border); background: var(--app-panel-muted); }
+.lesson-references ul { display: grid; gap: 7px; margin: 0; padding-left: 18px; }
+.lesson-references a { color: var(--app-accent); font-size: .74rem; text-underline-offset: 3px; }
+.lesson-references a:hover { color: var(--app-accent-strong); }
 
 .incident-selector { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding: 12px 15px; }
 .incident-selector label { color: var(--app-muted); font-size: .6rem; font-weight: 800; letter-spacing: .09em; }
@@ -384,6 +414,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .review-card > div:first-child { max-width: 620px; }
 .review-card h2 { font-size: .95rem; }
 .review-card p { margin-bottom: 0; }
+.upcoming-reviews { display: grid; gap: 10px; margin-top: 22px; }
+.upcoming-reviews > .section-kicker { margin: 0; }
+.upcoming-reviews .review-card { padding: 15px 18px; }
 .review-actions { display: flex; flex-wrap: wrap; justify-content: end; gap: 7px; }
 .review-rating { min-height: 34px; padding: 0 9px; border: 1px solid var(--app-border); background: var(--app-panel); color: var(--app-muted); font-size: .66rem; }
 .review-rating:hover, .review-rating.rating-easy { border-color: var(--app-accent); color: var(--app-accent); }
@@ -504,6 +537,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .assessment-controls { flex-wrap: wrap; }
   .assessment-save-state { order: 3; width: 100%; }
   .assessment-controls .primary-action { margin-left: auto; }
+  .assessment-skip-wrap .text-button { text-align: center; }
   .assessment-area-grid { grid-template-columns: 1fr; }
   .assessment-result-hero, .assessment-entry { align-items: flex-start; flex-direction: column; }
   .assessment-summary { align-items: flex-start; flex-direction: column; }
