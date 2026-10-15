@@ -112,7 +112,7 @@ describe("matriz excelência", () => {
 });
 
 describe("base curricular e mídia", () => {
-  it("9 módulos com framework; vídeos com ID válido; docs https", () => {
+  it("9 módulos com framework; vídeos com ID e idioma válidos; docs https", () => {
     for (const m of MODULES) {
       const media = MODULE_MEDIA[m.id];
       expect(media, m.id).toBeDefined();
@@ -120,11 +120,20 @@ describe("base curricular e mídia", () => {
       for (const v of media.videos) {
         expect(v.yt).toMatch(/^[A-Za-z0-9_-]{11}$/);
         expect(v.title.length).toBeGreaterThan(5);
+        expect(["PT-BR", "EN"]).toContain(v.lang);
       }
       for (const d of media.docs) {
         expect(d.url.startsWith("https://")).toBe(true);
         expect(d.label.length).toBeGreaterThan(5);
+        expect(["PT-BR", "EN"]).toContain(d.lang);
       }
+    }
+  });
+  it("módulos M1–M8 têm material em português (vídeo ou doc)", () => {
+    for (const m of MODULES.filter((x) => x.id !== "m9-carreira")) {
+      const media = MODULE_MEDIA[m.id];
+      const pt = media.videos.some((v) => v.lang === "PT-BR") || media.docs.some((d) => d.lang === "PT-BR");
+      expect(pt, m.id).toBe(true);
     }
   });
 });

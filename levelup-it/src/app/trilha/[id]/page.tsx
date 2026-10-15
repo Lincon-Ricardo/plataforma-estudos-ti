@@ -7,7 +7,7 @@ import { LESSONS } from "@/lib/seed-tracks";
 import { MODULE_MEDIA } from "@/lib/seed-media";
 import { LessonVisual, MODULE_HUE } from "@/components/diagrams";
 
-function VideoEmbed({ yt, title, channel }: { yt: string; title: string; channel: string }) {
+function VideoEmbed({ yt, title, channel, lang }: { yt: string; title: string; channel: string; lang: string }) {
   return (
     <div>
       <div className="aspect-video w-full overflow-hidden rounded border border-line bg-black">
@@ -15,7 +15,9 @@ function VideoEmbed({ yt, title, channel }: { yt: string; title: string; channel
           title={title} loading="lazy" allowFullScreen
           allow="accelerometer; encrypted-media; picture-in-picture" />
       </div>
-      <p className="text-xs text-muted mt-1">{title} · {channel} · apoio externo (YouTube)</p>
+      <p className="text-xs text-muted mt-1">
+        <span className="font-mono font-bold" style={{ color: lang === "PT-BR" ? "#7fd6a4" : "#a0b2b7" }}>[{lang}]</span> {title} · {channel}
+      </p>
     </div>
   );
 }
@@ -92,15 +94,29 @@ export default function LessonPage() {
         <section className="card" style={{ borderTop: `3px solid ${hue}` }}>
           <p className="label">Aprenda de outro jeito — ver antes de ler</p>
           <p className="text-[13px] text-muted mb-3">Base curricular: <strong className="text-bodytext">{media.framework}</strong></p>
-          {media.videos.length > 0 && (
-            <div className="grid gap-4">
-              {media.videos.map((v) => <VideoEmbed key={v.yt} {...v} />)}
-            </div>
+          {media.videos.some((v) => v.lang === "PT-BR") && (
+            <>
+              <p className="text-sm font-bold mb-2"><span className="font-mono" style={{ color: "#7fd6a4" }}>[PT-BR]</span> Assista em português primeiro</p>
+              <div className="grid gap-4 mb-4">
+                {media.videos.filter((v) => v.lang === "PT-BR").map((v) => <VideoEmbed key={v.yt} {...v} />)}
+              </div>
+            </>
+          )}
+          {media.videos.some((v) => v.lang !== "PT-BR") && (
+            <>
+              <p className="text-sm font-bold mb-2"><span className="font-mono text-muted">[EN]</span> Aprofunde em inglês (ative a legenda automática)</p>
+              <div className="grid gap-4">
+                {media.videos.filter((v) => v.lang !== "PT-BR").map((v) => <VideoEmbed key={v.yt} {...v} />)}
+              </div>
+            </>
           )}
           <p className="text-[13px] mt-3">Documentação oficial:</p>
           <ul className="text-sm mt-1 space-y-1">
-            {media.docs.map((d) => (
-              <li key={d.url + d.label}><a href={d.url} target="_blank" rel="noreferrer" className="underline" style={{ color: hue }}>{d.label} ↗</a></li>
+            {[...media.docs].sort((a, b) => (a.lang === b.lang ? 0 : a.lang === "PT-BR" ? -1 : 1)).map((d) => (
+              <li key={d.url + d.label}>
+                <span className="font-mono text-xs mr-1" style={{ color: d.lang === "PT-BR" ? "#7fd6a4" : "#a0b2b7" }}>[{d.lang}]</span>
+                <a href={d.url} target="_blank" rel="noreferrer" className="underline" style={{ color: hue }}>{d.label} ↗</a>
+              </li>
             ))}
           </ul>
         </section>
