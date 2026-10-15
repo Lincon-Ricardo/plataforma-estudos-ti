@@ -6,7 +6,7 @@ import { useStore } from "@/lib/store";
 const GROUPS: { caption: string; items: [string, string][] }[] = [
   { caption: "Aprender", items: [["Início", "/"], ["Trilha", "/trilha"], ["Diagnóstico", "/diagnostico"], ["Revisão", "/revisao"]] },
   { caption: "Praticar", items: [["Incidentes", "/incidentes"], ["Labs", "/laboratorios"], ["Projetos", "/projetos"], ["Plano", "/plano"]] },
-  { caption: "Carreira", items: [["Evolução", "/evolucao"], ["Entrevista", "/entrevista"], ["Diário", "/diario"], ["Tutor", "/tutor"]] },
+  { caption: "Carreira", items: [["Excelência", "/excelencia"], ["Evolução", "/evolucao"], ["Entrevista", "/entrevista"], ["Diário", "/diario"], ["Tutor", "/tutor"]] },
   { caption: "Conta", items: [["Perfil", "/perfil"]] },
 ];
 

@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { recommend, goals30_60_90 } from "@/lib/recommend";
 import { LESSONS } from "@/lib/seed-tracks";
-import { INCIDENTS, LABS } from "@/lib/seed-practice";
+import { INCIDENTS, LABS, PROJECTS } from "@/lib/seed-practice";
 import { INTERVIEW } from "@/lib/seed-interview";
+import { SKILLS, readiness } from "@/lib/seed-excellence";
+import { AREAS } from "@/lib/seed-diagnostic";
 import { lessonById } from "@/lib/store";
 import type { StoreShape } from "@/lib/types";
 
@@ -73,6 +75,37 @@ describe("banco de entrevistas", () => {
       expect(full.commands!.length).toBeGreaterThanOrEqual(1);
       expect(full.pitfalls!.length).toBeGreaterThanOrEqual(2);
     }
+  });
+});
+
+describe("matriz excelência", () => {
+  it("22 skills com evidências que existem de verdade", () => {
+    expect(SKILLS.length).toBe(22);
+    const lessonIds = new Set(LESSONS.map((l) => l.id));
+    const labIds = new Set(LABS.map((l) => l.id));
+    const incIds = new Set(INCIDENTS.map((i) => i.id));
+    const projIds = new Set(PROJECTS.map((p) => p.id));
+    const ivIds = new Set(INTERVIEW.map((q) => q.id));
+    for (const s of SKILLS) {
+      expect(s.evidence.length).toBeGreaterThanOrEqual(1);
+      for (const e of s.evidence) {
+        if (e.kind === "lesson") expect(lessonIds.has(e.ref)).toBe(true);
+        if (e.kind === "lab") expect(labIds.has(e.ref)).toBe(true);
+        if (e.kind === "incident") expect(incIds.has(e.ref)).toBe(true);
+        if (e.kind === "project") expect(projIds.has(e.ref)).toBe(true);
+        if (e.kind === "diagnostic") expect(AREAS.includes(e.ref)).toBe(true);
+        if (e.kind === "interview") expect(ivIds.has(e.ref)).toBe(true);
+      }
+    }
+  });
+  it("prontidão N2 soma 12 competências (N1+N2)", () => {
+    const r = readiness({
+      version: 1, profile: { name: "T", role: "", course: "", dailyMinutes: 45, studyDays: [], goal: "", targetDate: "", priorities: [], englishNote: "", updatedAt: "" },
+      completedLessons: {}, attempts: [], reviews: [], sessions: [], projects: [], diary: [], labDone: {}, incidentDone: {}, diagnosticDoneAt: null,
+    }, {});
+    expect(r.total).toBe(12);
+    expect(r.done).toBe(0);
+    expect(r.missing.length).toBe(12);
   });
 });
 
