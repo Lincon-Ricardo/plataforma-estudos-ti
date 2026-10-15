@@ -33,7 +33,6 @@ export const MODULE_MEDIA: Record<string, ModuleMedia> = {
     framework: "Microsoft Learn: AD DS + Entra ID · SC-300 (identidade e acesso)",
     videos: [{ yt: "i9I5poSokow", title: "What is Active Directory? Overview", channel: "YouTube", lang: "EN" }],
     docs: [
-      { label: "Active Directory — Wikipédia em português", url: "https://pt.wikipedia.org/wiki/Active_Directory", lang: "PT-BR" },
       { label: "O que é Active Directory? (Paessler, em PT-BR)", url: "https://www.paessler.com/br/it-explained/active-directory", lang: "PT-BR" },
       { label: "Microsoft Learn — Windows Server", url: "https://learn.microsoft.com/pt-br/windows-server/", lang: "PT-BR" },
     ],
